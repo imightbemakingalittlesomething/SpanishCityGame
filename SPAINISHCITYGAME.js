@@ -18,10 +18,8 @@ function renderMainMenu() {
         <button onclick="renderCityMap()">Access City Map</button>
         <button onclick="renderEchoMemory()">View Memory Echoes</button>
         <button onclick="renderInventory()">Inventory</button>
-        <button onclick="renderRelicShop()">Relic Vendor</button>
-        <button onclick="renderMissionBoard()">Mission Board</button>
-        <button onclick="renderGlitchPulse()">Scan Glitch Pulse</button>
-    `;
+         <button onclick="renderMissionBoard()">Mission Board</button>
+     `;
 }
 
 function renderInventory() {
@@ -288,7 +286,7 @@ function enterEzriWorkshop() {
     `;
 }
 
-function visitAltoVendor() {
+function talkToAlto() {
     document.getElementById("app").innerHTML = `
         <h1>Alto the Vendor</h1>
         <p>"Memory dust, cracked relics, or half a prophecy? I've got the good stuff — if you've got credits."</p>
@@ -521,4 +519,81 @@ function renderMissionBoard() {
 
 function renderGlitchPulse() {
     document.getElementById("app").innerHTML = `<h1>📡 Glitch Pulse</h1><p>You scan the grid... anomaly detected in the upper rings.</p><button onclick="renderMainMenu()">Back</button>`;
+}
+
+ 
+function trySynthfruit() {
+    document.getElementById("app").innerHTML = `
+        <h1>Synthfruit Vendor</h1>
+        <p>You approach a street vendor pushing a glowing, crackling tree in a wheelbarrow. It's the size of a man and smells like static and ripe bananas.</p>
+        <p><em>"What is that?"</em> you ask. The vendor raises an eyebrow. <em>"What, you don’t know? Pretend I’m stupid, I’m not from here."</em></p>
+        <p>"These fruits are divinely bequeathed upon us," he declares. "Bite, and you shall become one with the gods as your body digests their enzymes."</p>
+        <button onclick="eatSynthfruit()">Eat the synthfruit</button>
+        <button onclick="renderBrokenBellows()">Back away slowly</button>
+    `;
+}
+
+function eatSynthfruit() {
+    document.getElementById("app").innerHTML = `
+        <p>You take a bite. It tastes electric. Your tongue sears. You cough violently.</p>
+        <p>The vendor cackles. "What are you, wet behind the ears? Get outta the way of a real customer!"</p>
+        <p>He turns. "Sir! Over here! Synthfruit! Fresh from the branch!"</p>
+        <button onclick="renderBrokenBellows()">Wander off in shame</button>
+    `;
+}
+
+function lookThroughOfferingBox() {
+    document.getElementById("app").innerHTML = `
+        <h1>Offering Box</h1>
+        <p>You peer inside the offering box. A few dull coins. A small handmade doll with blue thread hair. A folded prayer that says: <em>"Don't forget me."</em></p>
+        <button onclick="renderBrokenBellows()">Step back</button>
+    `;
+}
+function observeBillboardLoop(step = 0) {
+    const ads = [
+        "Now enhanced with bio-link compatibility. The next neural frontier awaits.",
+        "Feeling alone? Register your thoughts today. Memories deserve immortality.",
+        "Install your new voice today. Become the version of yourself you remember best.",
+        "HEY YOU. YEAH YOU. BUY SOMETHING WOULD YA?! Hahaha!"
+    ];
+
+    if (step < ads.length - 1) {
+        document.getElementById("app").innerHTML = `
+            <h1>Billboard Ad Loop</h1>
+            <p>${ads[step]}</p>
+            <button onclick="observeBillboardLoop(${step + 1})">Keep watching</button>
+            <button onclick="renderBrokenBellows()">Look away</button>
+        `;
+    } else {
+        document.getElementById("app").innerHTML = `
+            <h1>The Billboard Notices You</h1>
+            <p>${ads[step]}</p>
+            <p>You suddenly feel like maybe it’s time to go. Fast.</p>
+            <button onclick="renderBrokenBellows()">Leave quickly</button>
+        `;
+    }
+}
+function fixLightTotem() {
+    document.getElementById("app").innerHTML = `
+        <h1>Light Totem</h1>
+        <p>The totem flickers weakly. You twist a rusted panel, re-route a glyph wire. Light stabilizes — just for a moment.</p>
+        <p>It hums a single note. You’re not sure if that was a thank-you or a warning.</p>
+        <button onclick="renderBrokenBellows()">Step back</button>
+    `;
+}
+function talkToElder() {
+    document.getElementById("app").innerHTML = `
+        <h1>Bathtub Elder</h1>
+        <p>The elder soaks in a ceramic tub built into the floor. He doesn’t look at you but speaks:</p>
+        <p>"The gods are peeling. Like old paint. You’d best not be under the flakes."</p>
+        <button onclick="renderBrokenBellows()">Nod respectfully</button>
+    `;
+}
+function knockCandleDoor() {
+    document.getElementById("app").innerHTML = `
+        <h1>Candle-Marked Door</h1>
+        <p>You knock. Nothing. Then three knocks echo from inside. Slow. Deliberate. The candle flickers green.</p>
+        <p>Better come back later. Or never.</p>
+        <button onclick="renderBrokenBellows()">Back away</button>
+    `;
 }
