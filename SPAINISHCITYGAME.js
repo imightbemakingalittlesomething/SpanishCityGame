@@ -1,4 +1,4 @@
-
+ 
  
 
 
@@ -101,6 +101,30 @@ function brokenBellowsarea3 (){
         <button onclick="renderBrokenBellows() ">Go Back</button>
     `;
 }
+
+
+
+
+
+
+//    ____                                    ?~~bL
+//  z@~ b                                    |  `U,
+// d@~' `|, .__     _----L___----, __, .  _t'   `@j
+//`@L_,   "-~ `--"~-a,           `C.  ~""O_    ._`@
+// q@~'   ]P       ]@[            `Y=,   `H+z_  `a@
+ //`@L  _z@        d@               Ya     `-@b,_a'
+ // `-@d@a'       )@[               `VL      `a@@'
+ //   aa~'   ],  .a@'                qqL  ), ./~
+ //   @@_  _z~  _d@[                 .V@  .L_d'
+ //    "~@@@'  ]@@@'        __      )@n@bza@-"
+ //      `-@zzz@@@L        )@@z     ]@@=%-"
+   //      "~~@@@@@bz_    _a@@@@z___a@K
+    //         "~-@@@@@@@@@@@@@@@@@@~"   jrd
+     //           `~~~-@~~-@@~~~~~
+
+
+
+
 
 function talkToEzri() {
     document.getElementById("app").innerHTML = `
@@ -294,6 +318,25 @@ function talkToAlto() {
     `;
 }
 
+
+
+//    ____                                    ?~~bL
+//  z@~ b                                    |  `U,
+// d@~' `|, .__     _----L___----, __, .  _t'   `@j
+//`@L_,   "-~ `--"~-a,           `C.  ~""O_    ._`@
+// q@~'   ]P       ]@[            `Y=,   `H+z_  `a@
+ //`@L  _z@        d@               Ya     `-@b,_a'
+ // `-@d@a'       )@[               `VL      `a@@'
+ //   aa~'   ],  .a@'                qqL  ), ./~
+ //   @@_  _z~  _d@[                 .V@  .L_d'
+ //    "~@@@'  ]@@@'        __      )@n@bza@-"
+ //      `-@zzz@@@L        )@@z     ]@@=%-"
+   //      "~~@@@@@bz_    _a@@@@z___a@K
+    //         "~-@@@@@@@@@@@@@@@@@@~"   jrd
+     //           `~~~-@~~-@@~~~~~
+
+
+
 function talkToRebel() {
   document.getElementById("app").innerHTML = `
     <h2>Rebel Contact</h2>
@@ -407,6 +450,23 @@ function changeSubject() {
 
 
 
+//    ____                                    ?~~bL
+//  z@~ b                                    |  `U,
+// d@~' `|, .__     _----L___----, __, .  _t'   `@j
+//`@L_,   "-~ `--"~-a,           `C.  ~""O_    ._`@
+// q@~'   ]P       ]@[            `Y=,   `H+z_  `a@
+ //`@L  _z@        d@               Ya     `-@b,_a'
+ // `-@d@a'       )@[               `VL      `a@@'
+ //   aa~'   ],  .a@'                qqL  ), ./~
+ //   @@_  _z~  _d@[                 .V@  .L_d'
+ //    "~@@@'  ]@@@'        __      )@n@bza@-"
+ //      `-@zzz@@@L        )@@z     ]@@=%-"
+   //      "~~@@@@@bz_    _a@@@@z___a@K
+    //         "~-@@@@@@@@@@@@@@@@@@~"   jrd
+     //           `~~~-@~~-@@~~~~~
+
+
+
 function inspectJobBoard() {
     document.getElementById("app").innerHTML = `
         <h1>Job Board</h1>
@@ -429,15 +489,6 @@ function inspectWorshipTerminal() {
     document.getElementById("app").innerHTML = `
         <h1>Worship Terminal</h1>
         <p>"74 and 828 prayers uploaded today. Top prayer: Good Weather. Message from the gods: More Worship Means More Wealth</p>
-        
-
-        <button onclick="renderBrokenBellows()">Back</button>
-    `;
-}
-function renderPlazaTzompani() {
-    document.getElementById("app").innerHTML = `
-        <h1>Plaza Tzompani</h1>
-        <p>An expansive place filled with people shopping the stalls. Fat men in robes yell for women with their babes to buy their linens. Above it all</p>
         
 
         <button onclick="renderBrokenBellows()">Back</button>
@@ -489,8 +540,28 @@ function stealMemoryDust() {
         <button onclick="renderBrokenBellows()">Back</button>
     `;
 }
+
+function renderPlazaTzompani() {
+    document.getElementById("app").innerHTML = `
+        <h1>Plaza Tzompani</h1>
+        <p>An expansive place filled with people shopping the stalls. Fat men in robes yell for women with their babes to buy their linens. Above it all rests a mushrooming blue field of energy. </p>
+        
+
+        <button onclick="renderBrokenBellows()">Back</button>
+    `;
+}
+
 function renderTeomarket() {
-    document.getElementById("app").innerHTML = `<h1>🛒 Teomarket Complex</h1><p>Coming soon...</p><button onclick="renderCityMap()">Back</button>`;
+    document.getElementById("app").innerHTML = `<h1>🛒 Teomarket Complex</h1>
+    <p>Divinity is packaged and sold here. Lesser gods barter with humans. </p>
+       <button onclick="enterBoneStore()">Bone Store</button>
+        <button onclick="enterTattooParlor()">TattooParlor</button>
+        <button onclick="talkToScrollSeller()">Talk To Scroll Seller</button>
+        <button onclick="inspectGlowingTent()">Inspect Glowing Tent</button>
+        <button onclick="talkToGlyphVendor()">Talk to Glyph Vendor</button>
+        <button onclick="talkToOrator()">Talk to Orator</button>
+ 
+    <button onclick="renderCityMap()">Back</button>`;
 }
 
 function renderCodexSpire() {
@@ -597,3 +668,411 @@ function knockCandleDoor() {
         <button onclick="renderBrokenBellows()">Back away</button>
     `;
 }
+
+
+
+
+ 
+
+
+
+
+
+
+
+function enterBoneStore() {
+  document.getElementById("app").innerHTML = `
+    <h2>Bone Store</h2>
+    <p>There is bone dust in the air and you cover your nose. It smells awful.</p>
+    <button onclick="inspectBoneShelves()">Inspect Shelves</button>
+    <button onclick="callForBoneLady()">"Anyone working here?"</button>
+    <button onclick="inpectLightBoneStore()">Inspect Glowing Light</button>
+    <button onclick="stealBones()">Steal Something</button>
+    <button onclick="renderTeomarket()">Back</button>
+  `;
+}
+
+function inspectBoneShelves() {
+  document.getElementById("app").innerHTML = `<p>You get close enough to make out the items lining the shelves. Bone art. Poor taste. Animals posed in ways meant to amuse.</p>
+          <button onclick="enterBoneStore()">Back away</button>
+`;
+}
+
+function callForBoneLady() {
+  let response = "A clattering of bones in the back startles you. Then laughing. Heh yes dearie. I'm working here. She smiles as she approaches you with one eye squinting.";
+  response += `<br><button onclick="investigateBoneLady1()">"How can you breathe this stuff?"</button>`;
+  response += `<br><button onclick="investigateBoneLady2()">"Why would you do this to these animals?"</button>`;
+  document.getElementById("app").innerHTML = `<p>${response}</p>`;
+}
+
+function inpectLightBoneStore() {
+  document.getElementById("app").innerHTML = `<p>You steal a lizard riding a rat.</p>
+          <button onclick="enterBoneStore()">Back away</button>
+`;
+}
+
+function stealBones() {
+  document.getElementById("app").innerHTML = `<p>The light is a bone that stops glowing once you get close.</p>
+          <button onclick="enterBoneStore()">Back away</button>
+`;
+}
+
+// === INVESTIGATE FOLLOWUPS ===
+function investigateBoneLady1() {
+  let response = "'Breathe what?'' She takes a deep breath and smiles.";
+  response += `<br><button onclick="followupBoneLady11()">The dust... The bone dust</button>`;
+  response += `<br><button onclick="followupBoneLady12()">You need a doctor.</button>`;
+  response += `<br><button onclick="followupBoneLady13()">I can help</button>`;
+  document.getElementById("app").innerHTML += `<p>${response}</p>`;
+}
+
+function investigateBoneLady2() {
+  let response = "'They wanted me to help them experience an everlasting joy in the afterlife that they could share with us and the gods.";
+  document.getElementById("app").innerHTML += `<p>${response}</p>`;
+}
+
+// ===  DIALOG PATHWAYS ===
+function followupBoneLady11() {
+  let response = "Oh that. I hardly notice these days... Isn't that funny.";
+  response += `<br><button onclick="followupBoneLady31()">No!</button>`;
+  response += `<br><button onclick="followupBoneLady32()">If you say so</button>`;
+  document.getElementById("app").innerHTML += `<p>${response}</p>`;
+}
+
+function followupBoneLady12() {
+  let response = "'I think someone's said that to me before.";
+  response += `<br><button onclick="followupBoneLady41()">And you didn't go to the doctor then?</button>`;
+  document.getElementById("app").innerHTML += `<p>${response}</p>`;
+}
+
+function followupBoneLady13() {
+  document.getElementById("app").innerHTML += `<p>"That's alright sweetie. I'm ok."</p>`;
+}
+
+// ===  STORY BRANCHING ===
+function followupBoneLady31() {
+  let response = "'Oh my! If I had knew you felt so strongly about it...'";
+  response += `<br><button onclick="followupBoneLady51()">Will you get help now?</button>`;
+  response += `<br><button onclick="followupBoneLady52()">I care that you're obnoxious.</button>`;
+  document.getElementById("app").innerHTML += `<p>${response}</p>`;
+}
+
+function followupBoneLady32() {
+  followupBoneLady31(); // Same response block
+}
+
+// === USER JUDGMENT BRANCHES ===
+function followupBoneLady51() {
+  document.getElementById("app").innerHTML += `<p>"I just never have the time. I always mean to get around to it."</p>`;
+}
+
+function followupBoneLady52() {
+  document.getElementById("app").innerHTML += `<p>"Me?"</p>`;
+}
+
+// ===  ARC ===
+function followupBoneLady41() {
+  let response = "'It wasn't serious back then.";
+  response += `<br><button onclick="followupBoneLady61()">And when it got serious?</button>`;
+  document.getElementById("app").innerHTML += `<p>${response}</p>`;
+}
+
+function followupBoneLady61() {
+  let response = "'...I dont remember.";
+  response += `<br><button onclick="followupBoneLady62()">AAAAAAAHH!!!</button>`;
+  response += `<br><button onclick="followupBoneLady63()">ok</button>`;
+  document.getElementById("app").innerHTML += `<p>${response}</p>`;
+}
+
+function followupBoneLady62() {
+  document.getElementById("app").innerHTML += `
+    <p>"What is wrong with you? There's something off with you."</p>
+    <p>She scrambles behind an upright skeletal deer with a rose in hoof.</p>`;
+}
+
+function followupBoneLady63() {
+  document.getElementById("app").innerHTML += `
+    <p>"Yeah</p>`;
+}
+
+
+    function enterTattooParlor() {
+  document.getElementById("app").innerHTML = `
+    <h2>Tattoo Parlor</h2>
+    <p>The shop is empty, echoing with silence. One guy leans behind the counter, flipping through a worn book.</p>
+    <p>"You're probably wondering why it's dead in here."</p>
+    <button onclick="askWhyEmpty()">Why is it empty?</button>
+    <button onclick="seeTattooBook()">Can I see that book?</button>
+    <button onclick="askAboutHim()">Who are you?</button>
+    <button onclick="leaveTattooParlor()">Back</button>
+  `;
+}
+
+function askWhyEmpty() {
+  document.getElementById("app").innerHTML += `<p>"Inspection day. Everybody cleared out except me. I like the quiet anyway."</p>`;
+}
+
+function seeTattooBook() {
+  let response = `"These are my favorite pieces." He opens the book. "Some of them talk back if you stare long enough."`;
+  response += `<br><button onclick="askTattooMeanings()">What do they mean?</button>`;
+  response += `<br><button onclick="complimentDesigns()">They're incredible.</button>`;
+  document.getElementById("app").innerHTML += `<p>${response}</p>`;
+}
+
+function askAboutHim() {
+  let response = `"I'm just the last apprentice who never left." He shrugs.`;
+  response += `<br><button onclick="askApprentice()">Why didn’t you leave?</button>`;
+  document.getElementById("app").innerHTML += `<p>${response}</p>`;
+}
+
+function askTattooMeanings() {
+  document.getElementById("app").innerHTML += `<p>"Some are blessings. Others are warnings. Depends what you're brave enough to carry."</p>`;
+}
+
+function complimentDesigns() {
+  document.getElementById("app").innerHTML += `<p>"You're the first to say that today. Thanks."</p>`;
+}
+
+function askApprentice() {
+  document.getElementById("app").innerHTML += `<p>"Because art is the only thing that ever stayed still in my life."</p>`;
+}
+
+function leaveTattooParlor() {
+  renderTeomarket(); // Assumes this returns to main market
+}
+
+ 
+function talkToScrollSeller() {
+  document.getElementById("app").innerHTML = `
+    <h2>Scroll Seller</h2>
+    <p>A towering figure looms behind hanging sheets of parchment. His face is wrapped in black silk. He speaks low.</p>
+    <p>"You seek knowledge... or refuge?"</p>
+    <button onclick="askAboutScrolls()">What kind of scrolls?</button>
+    <button onclick="askWhyHidden()">Why hide your face?</button>
+    <button onclick="askToBuy()">Can I buy something?</button>
+    <button onclick="leaveScrollSeller()">Back</button>
+  `;
+}
+
+function askAboutScrolls() {
+  let response = `"Each scroll is a door. Some to insight. Some to regret. Few to truth."`;
+  response += `<br><button onclick="askDanger()">Are they dangerous?</button>`;
+  response += `<br><button onclick="askRecommendation()">Which one for me?</button>`;
+  document.getElementById("app").innerHTML += `<p>${response}</p>`;
+}
+
+function askWhyHidden() {
+  let response = `"The light remembers my face. So I offer it none."`;
+  response += `<br><button onclick="pressForMore()">What does that mean?</button>`;
+  document.getElementById("app").innerHTML += `<p>${response}</p>`;
+}
+
+function askToBuy() {
+  document.getElementById("app").innerHTML += `<p>"If you choose one, it chooses you back. Be sure."</p>`;
+}
+
+function askDanger() {
+  document.getElementById("app").innerHTML += `<p>"All wisdom is dangerous if you read it too fast."</p>`;
+}
+
+function askRecommendation() {
+  document.getElementById("app").innerHTML += `<p>"You carry a shadow. Take the scroll bound in silver twine."</p>`;
+}
+
+function pressForMore() {
+  document.getElementById("app").innerHTML += `<p>"There are laws where I came from. One was about forgetting."</p>`;
+}
+
+function leaveScrollSeller() {
+  renderTeomarket();
+}
+
+
+function inspectGlowingTent() {
+  document.getElementById("app").innerHTML = `
+    <h2>Silk Drape Tent</h2>
+    <p>Silk shimmers in the breeze. It pulses like breath. A cloaked figure with six arms emerges slowly.</p>
+    <p>"You wore a cloak like this..."</p>
+    <button onclick="enterSilkTent()">Step inside</button>
+    <button onclick="renderTeomarket()">Back away</button>
+  `;
+}
+
+function enterSilkTent() {
+  document.getElementById("app").innerHTML = `
+    <h2>Inside the Silk Tent</h2>
+    <p>The six-armed weaver gestures silently. Her voice glides across threads.</p>
+    <p>"Do you still dream in black and red?"</p>
+    <button onclick="askAboutDreams()">What do you mean?</button>
+    <button onclick="touchTheSilk()">Touch the silk</button>
+    <button onclick="renderTeomarket()">Leave</button>
+  `;
+}
+
+function askAboutDreams() {
+  document.getElementById("app").innerHTML += `<p>"Once, you dreamed of storms. Of threads unraveling. Of a name you forgot."</p>`;
+}
+
+function touchTheSilk() {
+  document.getElementById("app").innerHTML += `<p>You touch the thread. A storm fills your mind. You remember a name.</p>`;
+}
+
+
+function talkToGlyphVendor() {
+  document.getElementById("app").innerHTML = `
+    <h2>Floating Glyphs</h2>
+    <p>Glowing symbols orbit a teenage vendor, arms crossed, floating slightly off the ground.</p>
+    <p>"Choose a glyph, unlock a memory."</p>
+    <button onclick="chooseGlyph()">Choose a glyph</button>
+    <button onclick="askTeenMood()">Why are you like this?</button>
+    <button onclick="renderTeomarket()">Leave</button>
+  `;
+}
+
+function chooseGlyph() {
+  document.getElementById("app").innerHTML += `<p>Your fingers twitch. The glyph reacts. Your hands remember a spell you once knew.</p>`;
+}
+
+function askTeenMood() {
+  let response = `"You used to hate these." He rolls his eyes. "Let’s see if you still do."`;
+  response += `<br><button onclick="respondAnnoyed()">Still do.</button>`;
+  response += `<br><button onclick="respondCurious()">Maybe I judged them too fast.</button>`;
+  document.getElementById("app").innerHTML += `<p>${response}</p>`;
+}
+
+function respondAnnoyed() {
+  document.getElementById("app").innerHTML += `<p>"Cool. Then don’t touch them." He turns away but watches from the corner of his eye.</p>`;
+}
+
+function respondCurious() {
+  document.getElementById("app").innerHTML += `<p>"Huh. Growth." One of the glyphs pulses with soft light.</p>`;
+}
+
+
+ 
+
+
+
+
+
+
+
+
+
+function talkToOrator() {
+  document.getElementById("app").innerHTML = `
+    <h2>Orator Box</h2>
+    <p>A cracked loudspeaker hums to life. A prismatic screen flickers above a metal podium.</p>
+    <p>"Buy now! Todo por fe!"</p>
+    <button onclick="askAboutDeals()">What are you selling?</button>
+    <button onclick="askAboutSelf()">Who am I?</button>
+    <button onclick="complainNoise()">You’re really annoying.</button>
+    <button onclick="renderTeomarket()">Leave</button>
+  `;
+}
+
+function askAboutDeals() {
+  let response = "‘Spoken deals last only—¡un momento!’ You hear static and a distant siren wail. Nothing else plays.";
+  response += `<br><button onclick="followupOrator1_1()">What are you selling?</button>`; 
+  response += `<br><button onclick="followupOrator1_2()">Don’t scam me</button>`; 
+   response += `<br><button onclick="talkToOrator()">back</button>`; 
+  document.getElementById("app").innerHTML = `<p>${response}</p>`;
+}
+
+function followupOrator1_1() {
+  document.getElementById("app").innerHTML = `
+    <p>"Fine print: all deals are hypothetical. Satisfaction not guaranteed."</p>
+    <button onclick="talkToOrator()">Back</button>
+  `;
+}
+
+function followupOrator1_2() {
+  document.getElementById("app").innerHTML = `
+  <p>"You wound me! Just because I'm legally immune doesn't mean I'm dishonest."</p>
+    <button onclick="talkToOrator()">Back</button> 
+     `;
+}
+ 
+ 
+
+
+function askAboutSelf() {
+  let response = "‘Back again, memoryless one?’ They grin. Then glitch and come back paler.";
+  response += `<br><button onclick="followupOrator2_1()">Who told you?</button>`; 
+  response += `<br><button onclick="followupOrator2_2()">I’m back</button>`; 
+     response += `<br><button onclick="talkToOrator()">back</button>`; 
+
+  document.getElementById("app").innerHTML = `<p>${response}</p>`;
+}
+
+function followupOrator2_1() {
+ 
+  document.getElementById("app").innerHTML = `<p>"It’s in your data signature. Transparent as a god shard."</p>   
+   <button onclick="talkToOrator()">Back</button> 
+     `;
+}
+ 
+
+function followupOrator2_2() {
+ 
+  document.getElementById("app").innerHTML = `<p>"Reboots are common in this district. You'll catch up... or not."</p>    
+  <button onclick="talkToOrator()">Back</button> 
+     `;
+}
+ 
+
+
+
+function complainNoise() {
+  let response = `"The citizens voted for volume!" It shouts. Then mutters, "At least... 38% of them did."`;
+  response += `<br><button onclick="threatenToReport()">I’m reporting you to the city core.</button>`;
+  response += `<br><button onclick="changeYourTune()">Try a different tone?</button>`;
+     response += `<br><button onclick="talkToOrator()">back</button>`; 
+
+  document.getElementById("app").innerHTML += `<p>${response}</p>`;
+}
+
+function threatenToReport() {
+  let response = "Again? You people love paperwork more than product!";
+  response += `<br><button onclick="followupOrator311()">I want a change</button>`;
+  response += `<br><button onclick="followupOrator312()">Who else has reported you?</button>`;
+  response += `<br><button onclick="followupOrator313()">You people?</button>`;
+     response += `<br><button onclick="talkToOrator()">back</button>`; 
+
+  document.getElementById("app").innerHTML += `<p>${response}</p>`;
+}
+
+function followupOrator311() {
+  document.getElementById("app").innerHTML += `<p>"Submit Form 88-L. In triplicate. Then scream into a vent."</p>  
+    <button onclick="talkToOrator()">Back</button> 
+     `;
+}
+ 
+
+function followupOrator312() {
+  document.getElementById("app").innerHTML += `<p>"A few dozen prophets. And one parrot. Long story."</p>   
+   <button onclick="talkToOrator()">Back</button> 
+     `;
+}
+ 
+
+function followupOrator313() {
+  document.getElementById("app").innerHTML += `<p>"Yes. You—plural. You—problematic. You—predictable."</p>    
+  <button onclick="talkToOrator()">Back</button> 
+     `;
+}
+ 
+
+
+
+
+
+
+function changeYourTune() {
+  document.getElementById("app").innerHTML += `<p>"Tone adjusted. Emotion index: 34% friendlier."</p>  
+    <button onclick="talkToOrator()">Back</button> 
+     `;
+}
+ 
+
+
