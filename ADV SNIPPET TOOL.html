@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🧩 Advanced Snippet Generator</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 900px; margin: auto; }
+    textarea, input { width: 100%; margin-top: 10px; padding: 10px; font-family: monospace; }
+    label { display: block; margin-top: 15px; font-weight: bold; }
+    button { margin-top: 20px; padding: 10px 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h2>🧩 Advanced Snippet Generator</h2>
+
+  <label for="template">Template</label>
+  <textarea id="template" rows="5" placeholder="e.g. &lt;button onclick='{{key}}()'&gt;{{label}}&lt;/button&gt;"></textarea>
+
+  <label for="flatValues">Flat Values (comma-separated)</label>
+  <textarea id="flatValues" rows="3" placeholder="e.g. talktoalto, talk to alto, trySynthfruitCart, try Synth fruit Cart"></textarea>
+
+  <label for="chunkSize">Chunk Size (how many values per group)</label>
+  <input type="number" id="chunkSize" min="1" value="2">
+
+  <button onclick="generateChunks()">Generate</button>
+
+  <h3>📦 Output</h3>
+  <textarea id="output" rows="15" readonly></textarea>
+
+  <script>
+    function generateChunks() {
+      const template = document.getElementById("template").value;
+      const rawInput = document.getElementById("flatValues").value;
+      const chunkSize = parseInt(document.getElementById("chunkSize").value);
+      const output = document.getElementById("output");
+
+      const allValues = rawInput.split(',').map(v => v.trim()).filter(v => v !== "");
+
+      if (allValues.length % chunkSize !== 0) {
+        alert("⚠️ Number of values must divide evenly by the chunk size.");
+        return;
+      }
+
+      const result = [];
+
+      for (let i = 0; i < allValues.length; i += chunkSize) {
+        const chunk = allValues.slice(i, i + chunkSize);
+        let snippet = template;
+
+        for (let j = 0; j < chunk.length; j++) {
+          const varName = `{{key${j + 1}}}`;
+          const altName = `{{label${j + 1}}}`;
+          // Allow aliases like key, label too
+          snippet = snippet.replace(new RegExp(`{{key${j + 1}}}`, 'g'), chunk[j]);
+          snippet = snippet.replace(new RegExp(`{{label${j + 1}}}`, 'g'), chunk[j]);
+        }
+
+        result.push(snippet);
+      }
+
+      output.value = result.join('\n\n');
+    }
+  </script>
+
+</body>
+</html>

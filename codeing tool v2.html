@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Function Stub Generator</title>
+  <style>
+    body { background-color: #9f47a1; font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+    textarea, input { background-color: #780b43;  width: 100%; margin-top: 10px; padding: 10px; font-family: monospace; }
+    button { margin-top: 15px; padding: 10px 20px; font-weight: bold; }
+    label { font-weight: bold; margin-top: 15px; display: block; }
+  </style>
+</head>
+<body>
+
+  <h2>🛠 Function Stub Generator v2 🛠 </h2>
+
+  <label for="inputCode">Paste the code that has functions called but u havent defined those functions</label>
+  <textarea id="inputCode" rows="10" placeholder="e.g. call talkToAlto(), talkToEzri(), talkToAlto() again..."></textarea>
+
+  <button onclick="generateStubs()">Generate Functions</button>
+
+  <h3>📦 Output:</h3>
+  <textarea id="output" rows="10" readonly></textarea>
+
+  <script>
+function generateStubs() {
+  const input = document.getElementById("inputCode").value;
+  const output = document.getElementById("output");
+
+  // Capture all function names followed by ()
+  const matches = [...input.matchAll(/\b([a-zA-Z0-9_]+)\s*\(\)/g)].map(m => m[1]);
+
+  // Build a frequency map
+  const freqMap = matches.reduce((acc, fn) => {
+    acc[fn] = (acc[fn] || 0) + 1;
+    return acc;
+  }, {});
+
+  // Filter out any function names that appear more than once
+  const uniqueOnce = Object.keys(freqMap).filter(fn => freqMap[fn] === 1);
+
+  // Generate stubs
+  const functions = uniqueOnce.map(name => `function ${name}() {
+    
+   \n<button onclick="()"></button> 
+    \n<button onclick="()"></button> 
+    \n<button onclick="()"></button>
+     \n<button onclick="()"></button>
+      \n<button onclick="()"></button>
+       \n<button onclick="()"></button>
+        \n<button onclick="()"></button>
+         \n}`).join("\n\n");
+
+  output.value = functions || "// No function calls found or all were duplicates.";
+}
+
+  </script>
+
+</body>
+</html>
