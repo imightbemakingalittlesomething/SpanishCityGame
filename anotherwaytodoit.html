@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family:sans-serif; background:#f0f0f0; padding:20px">
+
+<h2>🏙️ Explore: Undercity Slums</h2>
+<button onclick="showPlace()">Go to Slums</button>
+
+<div id="placeInfo" style="margin-top:20px; background:#fff; padding:10px; border:1px solid #ccc;"></div>
+<div id="placeActions" style="margin-top:10px;"></div>
+<div id="actionResult" style="margin-top:20px; font-style:italic;"></div>
+
+<script>
+// 🟣 Shared follow-ups — reusable dialogue blocks
+const sharedFollowups = {
+  askHelp: {
+    label: "Ask how to help",
+    result: "'There’s a datachip... no one’s supposed to mention it.'"
+  },
+  askLeader: {
+    label: "Ask about her leader",
+    result: "'Leader?' she repeats. 'We’re not a cult. Just tired people. Some of us listen better.'"
+  },
+  askPatrols: {
+    label: "Ask about the patrol patterns",
+    result: "'Noticed that, huh? They’re sloppy. But not stupid. Watch the timing at shift change.'"
+  }
+};
+
+// 🟣 Main location data
+const place_Slums = {
+  name: "Undercity Slums",
+  type: "residential",
+  parent: "Lower Sector",
+  description: "Crowded, dirty, alive. The slums pulse with stories and secrets.",
+  actions: [
+    {
+      label: "Speak to a rebel",
+      result: `
+        You approach a woman sitting on a crumbling step. She eyes you quietly.  
+        <br><br><strong>Grace Hughes.</strong>  
+        <br>Many things can be said of Grace Hughes, but most know that above all else she's surprising and sympathetic. Of course she's also resourceful, observant and persuasive, but in smaller doses and they're often spoiled by habits of being apathetic as well.  
+        <br><br>Her surprising nature though, this is what she's often adored for. On many occasions people will count on this and her resourcefulness whenever they need assistance or help.  
+        <br><br>She's watching you now, calmly. Not asking anything. Just... waiting.`,
+      followups: [
+        {
+          label: "Barter",
+          result: "You offer some scrap parts. She looks unimpressed. 'If I wanted rust, I’d eat the walls.'"
+        },
+        {
+          label: "Investigate",
+          result: "You mention the strange graffiti and how her presence seems... intentional.",
+          followups: [
+            sharedFollowups.askLeader,
+            sharedFollowups.askHelp,
+            sharedFollowups.askPatrols
+          ]
+        },
+        {
+          label: "Remain silent",
+          result: "She watches you quietly. After a moment, she says: 'You remind me of someone I used to know.'",
+          followups: [
+            sharedFollowups.askHelp // re-used from another branch
+          ]
+        },
+        {
+          label: "Try to impress",
+          result: "You recount a recent fight with patrol bots. She nods once. 'You live to tell it. That’s something.'",
+          followups: [
+            sharedFollowups.askLeader // re-used again
+          ]
+        }
+      ]
+    },
+    {
+      label: "Inspect the alley graffiti",
+      result: "Symbols match the ones from your dreams. Or are you just imagining that?"
+    }
+  ]
+};
+
+// 🟢 Render logic
+function showPlace() {
+  document.getElementById("actionResult").innerHTML = "";
+  document.getElementById("placeInfo").innerHTML =
+    `<h3>${place_Slums.name}</h3>
+     <p><strong>Type:</strong> ${place_Slums.type}</p>
+     <p><strong>Parent:</strong> ${place_Slums.parent}</p>
+     <p><strong>Description:</strong> ${place_Slums.description}</p>`;
+
+  let actionsHTML = "<h4>What do you want to do?</h4>";
+  place_Slums.actions.forEach((action, index) => {
+    actionsHTML += `<button onclick="runAction(${index}, null, null)">🡒 ${action.label}</button><br>`;
+  });
+  document.getElementById("placeActions").innerHTML = actionsHTML;
+}
+
+function runAction(actionIndex, subIndex, subSubIndex) {
+  let action = place_Slums.actions[actionIndex];
+  let result = action.result;
+
+  if (subIndex !== null) {
+    action = action.followups[subIndex];
+    result = action.result;
+  }
+  if (subSubIndex !== null) {
+    action = action.followups[subSubIndex];
+    result = action.result;
+  }
+
+  document.getElementById("actionResult").innerHTML = `<p>${result}</p>`;
+
+  if (action.followups) {
+    let html = "<h4>↪️ What next?</h4>";
+    action.followups.forEach((f, i) => {
+      if (subIndex === null) {
+        html += `<button onclick="runAction(${actionIndex}, ${i}, null)">${f.label}</button><br>`;
+      } else {
+        html += `<button onclick="runAction(${actionIndex}, ${subIndex}, ${i})">${f.label}</button><br>`;
+      }
+    });
+    document.getElementById("actionResult").innerHTML += html;
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DnD-Lite Combat Test</title>
+  <style>
+    body { font-family: sans-serif; background: #222; color: white; padding: 20px; }
+    button { margin: 5px; padding: 10px 20px; }
+    .log { margin-top: 20px; white-space: pre-wrap; border-top: 1px solid #555; padding-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>⚔️ Combat: You vs <span id="enemyName">Angry Citizen</span></h2>
+  <div id="stats"></div>
+  <div id="actions"></div>
+  <div><button onclick="rollForAction()">🎲 Roll Action Dice</button></div>
+  <div><button onclick="viewJournal()">📓 View Journal</button></div>
+  <div class="log" id="log"></div>
+
+  <script>
+// === DICE UTILS ===
+function rollDice(sides) {
+  return Math.floor(Math.random() * sides) + 1;
+}
+function log(message) {
+  document.getElementById("log").innerText += message + "\n";
+}
+
+let lastPlayerRoll = null;
+function rollForAction() {
+  lastPlayerRoll = rollDice(20);
+  log(`🎲 You rolled a d20: ${lastPlayerRoll}`);
+}
+
+// === RESOURCE SYSTEM ===
+class Entity {
+  constructor(name, level, hp, mana, stamina) {
+    this.name = name;
+    this.level = level;
+    this.hp = hp;
+    this.mana = mana;
+    this.stamina = stamina;
+  }
+
+  isAlive() {
+    return this.hp > 0;
+  }
+}
+
+// === CLASSES ===
+const Classes = {
+  Warrior: {
+    trait: "Strong Strike",
+    ability: function (attacker, target) {
+      if (attacker.stamina < 5) return log(`${attacker.name} is too tired!`);
+      if (lastPlayerRoll === null) return log("Roll the dice first!");
+      attacker.stamina -= 5;
+      const multiplier = lastPlayerRoll >= 15 ? 2 : (lastPlayerRoll >= 10 ? 1.5 : 1);
+      const dmg = Math.floor((rollDice(8) + 2) * multiplier);
+      target.hp -= dmg;
+      log(`${attacker.name} hits ${target.name} for ${dmg}.`);
+      lastPlayerRoll = null;
+    }
+  },
+  Mage: {
+    trait: "Firebolt",
+    ability: function (attacker, target) {
+      if (attacker.mana < 5) return log(`${attacker.name} lacks mana!`);
+      if (lastPlayerRoll === null) return log("Roll the dice first!");
+      attacker.mana -= 5;
+      const multiplier = lastPlayerRoll >= 15 ? 2 : (lastPlayerRoll >= 10 ? 1.5 : 1);
+      const dmg = Math.floor((rollDice(10) + 3) * multiplier);
+      target.hp -= dmg;
+      log(`${attacker.name} burns ${target.name} for ${dmg}.`);
+      lastPlayerRoll = null;
+    }
+  },
+  Rogue: {
+    trait: "Quick Jab",
+    ability: function (attacker, target) {
+      if (attacker.stamina < 3) return log(`${attacker.name} is out of stamina!`);
+      if (lastPlayerRoll === null) return log("Roll the dice first!");
+      attacker.stamina -= 3;
+      const multiplier = lastPlayerRoll >= 15 ? 2 : (lastPlayerRoll >= 10 ? 1.5 : 1);
+      const dmg = Math.floor((rollDice(6) + 1) * multiplier);
+      target.hp -= dmg;
+      log(`${attacker.name} jabs ${target.name} for ${dmg}.`);
+      lastPlayerRoll = null;
+    }
+  },
+  Bard: {
+    trait: "Sonic Laugh",
+    ability: function (attacker, target) {
+      if (attacker.mana < 4) return log(`${attacker.name} needs more mana!`);
+      if (lastPlayerRoll === null) return log("Roll the dice first!");
+      attacker.mana -= 4;
+      const multiplier = lastPlayerRoll >= 15 ? 2.2 : (lastPlayerRoll >= 10 ? 1.4 : 1);
+      const dmg = Math.floor((rollDice(6) + 4) * multiplier);
+      target.hp -= dmg;
+      log(`${attacker.name} laughs wildly and deals ${dmg} to ${target.name}.`);
+      lastPlayerRoll = null;
+    }
+  }
+};
+
+// === PLAYER ===
+class Player extends Entity {
+  constructor(name, className) {
+    super(name, 1, 30, 10, 10);
+    this.className = className;
+    this.ability = Classes[className].ability;
+    this.xp = 0;
+    this.journal = [];
+  }
+
+  gainXP(amount) {
+    this.xp += amount;
+    log(`${this.name} gains ${amount} XP.`);
+  }
+
+  unlockAbility(newText) {
+    this.journal.push(newText);
+    log(`New journal entry added.`);
+  }
+}
+
+class NPC extends Entity {
+  constructor(name, level, className) {
+    const baseHp = 20 + rollDice(6) * level;
+    const baseMana = 10 + rollDice(4) * level;
+    const baseStamina = 10 + rollDice(4) * level;
+    super(name, level, baseHp, baseMana, baseStamina);
+    this.className = className;
+    this.ability = Classes[className].ability;
+  }
+}
+
+const player = new Player("Hero", "Mage");
+let currentEnemy = new NPC("Angry Citizen", 1, "Warrior");
+
+function updateStats() {
+  document.getElementById("stats").innerHTML =
+    `<b>${player.name}</b> (Class: ${player.className})<br>HP: ${player.hp} | Mana: ${player.mana} | Stamina: ${player.stamina} | XP: ${player.xp}<br><br>` +
+    `<b>${currentEnemy.name}</b> (Class: ${currentEnemy.className})<br>HP: ${currentEnemy.hp} | Mana: ${currentEnemy.mana} | Stamina: ${currentEnemy.stamina}`;
+}
+
+function updateActions() {
+  const btns = `
+    <button onclick="playerAttack()">Use ${Classes[player.className].trait}</button>
+    <button onclick="endTurn()">End Turn</button>
+  `;
+  document.getElementById("actions").innerHTML = btns;
+}
+
+function playerAttack() {
+  if (!player.isAlive() || !currentEnemy.isAlive()) return;
+  player.ability(player, currentEnemy);
+  updateStats();
+  if (!currentEnemy.isAlive()) {
+    handleVictory();
+  }
+}
+
+function endTurn() {
+  currentEnemy.ability(currentEnemy, player);
+  player.mana += 2;
+  player.stamina += 3;
+  currentEnemy.mana += 2;
+  currentEnemy.stamina += 3;
+  updateStats();
+  if (!player.isAlive()) {
+    log("You have been defeated. Refresh to retry.");
+    document.getElementById("actions").innerHTML = '';
+  }
+}
+
+function handleVictory() {
+  log(`${currentEnemy.name} has been defeated!`);
+  player.gainXP(currentEnemy.level * 10);
+  player.unlockAbility(`You defeated ${currentEnemy.name}. You're one step closer to mastering your fate.`);
+  document.getElementById("actions").innerHTML = '<button onclick="viewJournal()">View Journal</button>';
+}
+
+function viewJournal() {
+  document.getElementById("log").innerText = "--- JOURNAL ---\n" + player.journal.join("\n") + "\n---";
+  document.getElementById("actions").innerHTML = '<button onclick="startNextBattle()">Continue</button>';
+}
+
+function startNextBattle() {
+  currentEnemy = new NPC("Mysterious Stranger", 2, "Bard");
+  document.getElementById("enemyName").innerText = currentEnemy.name;
+  log("A new foe approaches...");
+  updateStats();
+  updateActions();
+}
+
+updateStats();
+updateActions();
+</script>
+
+</body>
+</html>

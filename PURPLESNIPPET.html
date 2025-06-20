@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Purple Snippet Generator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f0e6f6;
+      color: #4b0082;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    h2, h3, label {
+      color: #4b0082;
+    }
+
+    textarea, input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-family: monospace;
+      background-color: #e5d4f4;
+      border: 1px solid #c8a2c8;
+      color: #4b0082;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-weight: bold;
+      background-color: #d1a3ff;
+      color: #4b0082;
+      border: none;
+      cursor: pointer;
+    }
+
+    .var-box {
+      margin-top: 10px;
+      padding: 10px;
+      background: #ecdaf5;
+      border: 1px solid #c8a2c8;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>💜 Snippet Generator – Purple Edition</h2>
+
+  <label for="template">Template Snippet</label>
+  <textarea id="template" rows="6" placeholder="Example: &lt;div id='{{name}}' class='{{class}}'&gt;&lt;/div&gt;"></textarea>
+
+  <label for="count">How many snippets do you want to generate?</label>
+  <input type="number" id="count" value="3">
+
+  <label for="varCount">How many variable boxes do you want?</label>
+  <input type="number" id="varCount" value="2">
+  <button onclick="createBoxes()">➕ Generate Variable Boxes</button>
+  <button onclick="addBox()">+ Add One Variable Box</button>
+
+  <div id="varInputs"></div>
+
+  <button onclick="generate()">🚀 Generate Snippets</button>
+
+  <h3>🧾 Output</h3>
+  <textarea id="output" rows="10" readonly></textarea>
+
+  <script>
+    let boxCounter = 0;
+
+    function createBoxes() {
+      const container = document.getElementById("varInputs");
+      container.innerHTML = ""; // Reset
+      boxCounter = 0;
+      const count = parseInt(document.getElementById("varCount").value);
+      for (let i = 0; i < count; i++) {
+        addBox();
+      }
+    }
+
+    function addBox() {
+      const container = document.getElementById("varInputs");
+      const boxHTML = `
+        <div class="var-box">
+          <input type="text" class="var-input" placeholder="e.g. name=Alice,Bob,Charlie">
+        </div>`;
+      container.insertAdjacentHTML("beforeend", boxHTML);
+      boxCounter++;
+    }
+
+    function generate() {
+      const template = document.getElementById("template").value;
+      const count = parseInt(document.getElementById("count").value);
+      const inputs = document.querySelectorAll(".var-input");
+      const output = document.getElementById("output");
+
+      let valueMap = {};
+
+      inputs.forEach(input => {
+        const raw = input.value.trim();
+        const [key, values] = raw.split('=');
+        if (key && values) {
+          valueMap[key.trim()] = values.split(',').map(v => v.trim());
+        }
+      });
+
+      let results = [];
+
+      for (let i = 0; i < count; i++) {
+        let line = template.replace(/{{i}}/g, i);
+        for (const key in valueMap) {
+          const val = valueMap[key][i % valueMap[key].length];
+          const regex = new RegExp(`{{${key}}}`, 'g');
+          line = line.replace(regex, val);
+        }
+        results.push(line);
+      }
+
+      output.value = results.join('\n');
+    }
+
+    // Initialize with default boxes
+    createBoxes();
+  </script>
+
+</body>
+</html>

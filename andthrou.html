@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Anthropology Game</title>
+  <style>
+    .screen { display: none; }
+  </style>
+</head>
+<body onload="startGame()">
+
+  <!-- Main Menu -->
+  <div id="mainMenu" class="screen">
+    <h1>Will You Be the One to Save Us?</h1>
+    <button onclick="goTo('economyScreen')">Economy</button>
+    <button onclick="goTo('societyScreen')">Society</button>
+    <button onclick="goTo('desperationScreen')">Desperation Mode</button>
+    <button onclick="goTo('justiceScreen')">Justice</button>
+
+<button onclick="clearLog()">Clear Log</button>
+
+  </div>
+
+  <!-- Economy Screen -->
+  <div id="economyScreen" class="screen">
+    <h2>Economy</h2>
+    <p>Money: <span id="moneyDisplay"></span></p>
+    <button onclick="buildFarm()">Build Government Farm (Cost: 100)</button>
+    <button onclick="openMarket()">Open Market (Cost: 80)</button>
+    <button onclick="buildFactory()">Build Factory ($200)</button>
+
+
+    
+    <br><br>
+    <button onclick="goTo('mainMenu')">Back</button>
+  </div>
+
+  <!-- Society Screen -->
+  <div id="societyScreen" class="screen">
+    <h2>Society</h2>
+    <p>Morale: <span id="moraleDisplay"></span></p>
+    <p>Health: <span id="healthDisplay"></span></p>
+    <p>Schools: <span id="schoolCountDisplay"></span></p>
+    <p>Education: <span id="educationDisplay"></span></p>
+    <p>Crime: <span id="crimeDisplay"></span></p>
+    <p>Wealth: <span id="wealthDisplay"></span></p>
+    <p>Radicalization: <span id="radicalizationDisplay"></span></p>
+     <p>Prisons: <span id="prisonCountDisplay"></span></p>
+  <p>Prison Capacity: <span id="prisonCapacityDisplay"></span></p>
+  <p>Prisoners: <span id="prisonersDisplay"></span></p>
+<p>Risk Level: <span id="riskDisplay"></span></p>
+<p>Stability Research: <span id="stabilityDisplay"></span></p>
+<p>Home Life: <span id="homeLifeDisplay"></span></p>
+<small>(Improves when morale, health, and safety are good)</small>
+
+
+
+    <button onclick="buildClinic()">Build Clinic (Cost: 150)</button>
+    <button onclick="buildSchool()">Build School (Cost: 120)</button>
+    <button onclick="buildPoliceStation()">Build Police Station (Cost: 100)</button>
+
+    <br><br>
+    <button onclick="goTo('mainMenu')">Back</button>
+  </div>
+
+  <!-- Desperation Screen -->
+  <div id="desperationScreen" class="screen">
+    <h2>Desperation Mode</h2>
+    <p>Your nation is struggling. These are last-resort options.</p>
+    <button onclick="sellArtifacts()">Sell Precious Artifacts (+200 money, morale -10)</button>
+    <button onclick="legalizeHeroin()">Legalize Heroin (+300 money, health -15)</button>
+    <br><br>
+    <button onclick="goTo('mainMenu')">Back</button>
+  </div>
+
+<div id="eventPanel" class="screen">
+  <h2 id="eventTitle"></h2>
+  <p id="eventDescription"></p>
+  <button id="option1Btn"></button>
+  <button id="option2Btn"></button>
+  <button id="option3Btn" style="display: none;"></button>
+</div>
+
+<div id="justiceScreen" class="screen">
+  <h2>Justice System</h2>
+  <p>Prisons: <span id="prisonCountDisplay"></span></p>
+  <p>Prison Capacity: <span id="prisonCapacityDisplay"></span></p>
+  <p>Prisoners: <span id="prisonersDisplay"></span></p>
+  <button onclick="buildPrison()">Build Prison (Cost: $200)</button>
+  <br><br>
+  <button onclick="goTo('mainMenu')">Back</button>
+</div>
+
+<audio id="soundFlood" src="flood.mp3"></audio>
+<audio id="soundScandal" src="scandal.mp3"></audio>
+<audio id="soundClick" src="click.mp3"></audio>
+<audio id="soundFlood" src="flood.mp3"></audio>
+<audio id="soundScandal" src="scandal.mp3"></audio>
+
+<div id="logBox" style="border: 1px solid black; padding: 10px; height: 100px; overflow-y: auto;">
+  <strong>Log:</strong><br>
+  <div id="logMessages"></div>
+</div>
+
+  <script>
+    let money = 500;
+let morale = 60;
+let clinicCount = 0;
+let health = 70;
+let homeLife = 50;
+let prisonCount = 0;
+let prisonCapacity = 0;
+let prisoners = 10; // start with some
+let releasedPrisoners = 0;
+let radicalization = 0;
+let risk = 0;                 // 0–100 scale maybe
+let stabilityResearch = 0;    // points you've earned
+
+// New stats
+let schoolCount = 0;
+let education = 50;
+let educationCapacity = 0;
+let population = 120; // Or however many people you're tracking
+
+let crime = 40;    // lower is better
+let wealth = 45;
+let farmCount = 0;
+let rehabCount = 0;
+let factoryCount = 0;
+
+
+    function startGame() {
+      goTo('mainMenu');
+      setInterval(triggerRandomBadEvent, 30000); // 30000 ms = 30 seconds
+     setInterval(gameTick, 20000); // Runs every 20 seconds
+
+
+
+
+      updateDisplay();
+    }
+
+    function goTo(screenId) {
+      let screens = document.querySelectorAll('.screen');
+      for (let i = 0; i < screens.length; i++) {
+        screens[i].style.display = 'none';
+      }
+      document.getElementById(screenId).style.display = 'block';
+    }
+
+  function updateDisplay() {
+  document.getElementById("moneyDisplay").textContent = money;
+  document.getElementById("moraleDisplay").textContent = morale;
+  document.getElementById("healthDisplay").textContent = health;
+  document.getElementById("crimeDisplay").textContent = crime;
+  document.getElementById("wealthDisplay").textContent = wealth;
+  document.getElementById("prisonCountDisplay").textContent = prisonCount;
+  document.getElementById("prisonCapacityDisplay").textContent = prisonCapacity;
+  document.getElementById("prisonersDisplay").textContent = prisoners;
+  document.getElementById("schoolCountDisplay").textContent = schoolCount;
+  document.getElementById("educationDisplay").textContent = education;
+document.getElementById("radicalizationDisplay").textContent = radicalization;
+document.getElementById("riskDisplay").textContent = Math.floor(risk);
+document.getElementById("stabilityDisplay").textContent = stabilityResearch;
+document.getElementById("homeLifeDisplay").textContent = Math.floor(homeLife);
+
+
+}
+
+
+    function buildFarm() {
+      if (money >= 100) {
+        money -= 100;
+        money += 50; // immediate return
+        farmCount += 1;
+        morale += 2;
+        logMessage("You built a farm! Productivity increased.");
+        updateDisplay();
+      } else {
+        logMessage("Not enough money!");
+      }
+    }
+    function generateFarmIncome() {
+  let income = farmCount * 25;
+  money += income;
+}
+
+function logMessage(msg) {
+  let log = document.getElementById("logMessages");
+  let time = new Date().toLocaleTimeString();
+  log.innerHTML += `[${time}] ${msg}<br>`;
+  log.scrollTop = log.scrollHeight; // auto-scroll to newest
+}
+
+    function buildClinic() {
+      if (money >= 150) {
+        money -= 150;
+        health += 10;
+        morale += 3;
+            clinicCount += 1;
+
+        logMessage("You built a clinic! Health and morale improved.");
+        updateDisplay();
+      } else {
+        logMessage("Not enough money!");
+      }
+    }
+function checkClinicCapacity() {
+  let clinicCapacity = clinicCount * 25;
+  if (population > clinicCapacity) {
+    health -= 5;
+    logMessage("Your clinics are overcrowded. Health dropped.");
+  }
+}
+
+    function sellArtifacts() {
+      money += 200;
+      morale -= 10;
+      logMessage("You sold priceless artifacts. The nation is richer, but people are sad.");
+      updateDisplay();
+    }
+
+    function legalizeHeroin() {
+      money += 300;
+      health -= 15;
+      logMessage("You legalized heroin. Income rises, but health suffers.");
+      updateDisplay();
+    }
+
+   function buildSchool() {
+  if (money >= 120) {
+    money -= 120;
+    morale += 4;
+        schoolCount += 1;
+      educationCapacity = schoolCount * 30;
+
+    education += 10;
+    logMessage("You built a school! Education and morale increased.");
+    updateDisplay();
+  } else {
+    logMessage("Not enough money!");
+  }
+}
+
+function updateEducation() {
+  if (population === 0) return; // avoid dividing by 0
+
+  let coverage = educationCapacity / population;
+  let quality = Math.min(coverage * (homeLife / 100), 1);
+education += Math.floor(quality * 5);
+  if (coverage > 1) coverage = 1;
+
+  let gain = Math.floor(coverage * 5); // max gain = +5
+  education += gain;
+
+  // Optional: penalize if coverage is bad
+  if (coverage < 0.5) {
+    morale -= 1;
+    logMessage("Overcrowded schools! Education quality is low.");
+  }
+}
+
+
+function buildPoliceStation() {
+  if (money >= 100) {
+    money -= 100;
+    crime -= 8;
+    morale += 1;
+    logMessage("You built a police station! Crime went down.");
+    updateDisplay();
+  } else {
+    logMessage("Not enough money!");
+  }
+}
+
+function openMarket() {
+  if (money >= 80) {
+    money -= 80;
+    money += 40;
+    wealth += 6;
+    morale += 1;
+    logMessage("You opened a market! Wealth and morale improved.");
+    updateDisplay();
+  } else {
+    logMessage("Not enough money!");
+  }
+}
+
+function buildFactory() {
+  if (money >= 200) {
+    money -= 200;
+    factoryCount += 1;
+    logMessage("You built a factory!");
+    updateDisplay();
+  } else {
+    logMessage("Not enough money!");
+  }
+}
+function generateFactoryIncome() {
+  let maxEffective = Math.floor(population / 10);
+  let activeFactories = Math.min(factoryCount, maxEffective);
+  let income = activeFactories * 50;
+  money += income;
+
+  if (factoryCount > maxEffective) {
+    logMessage("Too many factories! Some are sitting unused.");
+  }
+}
+
+
+
+
+function buildRehabCenter() {
+  if (money >= 150) {
+    money -= 150;
+    rehabCount += 1;
+    logMessage("Built a rehab center! Total: " + rehabCount);
+    updateDisplay();
+  } else {
+    logMessage("Not enough money!");
+  }
+}
+
+function runRehabEffects() {
+  let rehabbed = 0;
+
+  let successChance = (education + morale + homeLife) / 300;
+
+  // Overcrowded prisons make rehab less effective
+  if (prisoners > prisonCapacity) {
+    successChance *= 0.5;
+  }
+
+  for (let i = 0; i < rehabCount; i++) {
+    if (prisoners > 0 && Math.random() < successChance) {
+      prisoners--;
+      releasedPrisoners++;
+      morale += 1;
+      rehabbed++;
+    }
+  }
+
+  if (rehabbed > 0) {
+logMessage(`${rehabbed} prisoners rehabilitated and released.`);
+  }
+}
+
+function checkReoffending() {
+  if (homeLife < 40 || morale < 40) {
+    let reoffendChance = Math.floor(Math.random() * 100);
+    if (reoffendChance < 25 && releasedPrisoners > 0) {
+      prisoners += 1;
+      releasedPrisoners -= 1;
+      logMessage("A released citizen re-offended and returned to prison.");
+    }
+    
+  }
+}
+function payForPrisons() {
+  money -= prisonCount * 10;
+}
+
+
+
+function clearLog() {
+  document.getElementById("logMessages").innerHTML = "";
+}
+
+
+
+
+
+
+
+
+
+function triggerRandomBadEvent() {
+  let events = [
+    {
+      title: "Flood Hits Farmland",
+      description: "Heavy rains destroyed crops and damaged property.",
+      options: [
+        {
+          text: "Pay for cleanup ($100)",
+          action: function () {
+            money -= 100;
+            morale += 5;
+          }
+        },
+        {
+          text: "Ignore it",
+          action: function () {
+            morale -= 5;
+            crime += 3;
+          }
+        }
+      ],
+      soundId: "soundFlood"
+    },
+    {
+      title: "Corruption Scandal",
+      description: "A minor official stole funds. What do you do?",
+      options: [
+        {
+          text: "Fire and investigate",
+          action: function () {
+            morale += 2;
+            crime -= 3;
+          }
+        },
+        {
+          text: "Cover it up (no penalty)",
+          action: function () {
+            // nothing happens
+          }
+        },
+        {
+          text: "Blame someone else (morale -5)",
+          action: function () {
+            morale -= 5;
+          }
+        }
+      ],
+      soundId: "soundScandal"
+    }
+  ]
+
+  let corruptionChance = Math.min(risk / 100, 0.5); // Max 50% chance
+let roll = Math.random();
+
+let event;
+
+if (roll < corruptionChance) {
+  event = events.find(e => e.title === "Corruption Scandal");
+} else {
+  // pick any non-corruption event
+  let nonCorruptionEvents = events.filter(e => e.title !== "Corruption Scandal");
+  event = nonCorruptionEvents[Math.floor(Math.random() * nonCorruptionEvents.length)];
+}
+
+
+  // 🔊 Play the sound for the event
+  playSound(event.soundId);
+
+  // Show the event panel with choices
+  showEvent(event);
+}
+
+
+function showEvent(event) {
+  // Show the event panel
+  goTo("eventPanel");
+
+  // Fill in title and description
+  document.getElementById("eventTitle").textContent = event.title;
+  document.getElementById("eventDescription").textContent = event.description;
+
+  // Set up option buttons
+  let options = event.options;
+
+  document.getElementById("option1Btn").textContent = options[0].text;
+  document.getElementById("option1Btn").onclick = function() {
+    options[0].action();
+    endEvent();
+  };
+
+  document.getElementById("option2Btn").textContent = options[1].text;
+  document.getElementById("option2Btn").onclick = function() {
+    options[1].action();
+    endEvent();
+  };
+
+  // Optional 3rd option
+  if (options[2]) {
+    document.getElementById("option3Btn").style.display = "inline";
+    document.getElementById("option3Btn").textContent = options[2].text;
+    document.getElementById("option3Btn").onclick = function() {
+      options[2].action();
+      endEvent();
+    };
+  } else {
+    document.getElementById("option3Btn").style.display = "none";
+  }
+}
+
+function endEvent() {
+  goTo("mainMenu"); // Or wherever you want to send the player
+  updateDisplay();
+}
+
+
+
+
+function buildPrison() {
+  if (money >= 200) {
+    money -= 200;
+    prisonCount += 1;
+    prisonCapacity += 50;
+    morale -= 3; // People don't like lots of prisons
+    logMessage("You built a prison. Capacity increased, but morale dropped.");
+    updateDisplay();
+  } else {
+    logMessage("Not enough money!");
+  }
+}
+
+function updateCrimeEffects() {
+  if (crime > 50) prisoners += 1;
+}
+
+function checkPrisonOvercrowding() {
+  if (prisoners > prisonCapacity) {
+    morale -= 5;
+    logMessage("Prisons are overcrowded! Morale dropped.");
+  }
+}
+
+function passiveMoraleDropFromPrisons() {
+  morale -= prisonCount * 0.1;
+}
+function increaseRadicalization() {
+  if (prisonCount > 3) {
+    radicalization += prisonCount * 0.3;
+  }
+}
+// Risk consequences
+if (risk > 20) {
+  morale -= 1;
+}
+if (risk > 40) {
+  radicalization += 1;
+}
+
+ function updateHomeLife() {
+  let before = homeLife;
+
+  if (morale > 60 && health > 60 && education > 60 && crime < 30) {
+    homeLife += 1;
+  }
+
+  if (morale < 40 || health < 40 || crime > 60 || radicalization > 40) {
+    homeLife -= 1;
+  }
+
+  // Clamp between 0 and 100
+  if (homeLife < 0) homeLife = 0;
+  if (homeLife > 100) homeLife = 100;
+
+  // Optional pop-up message when it drops
+  if (homeLife < before) {
+    logMessage("Home Life worsened due to poor morale or conditions.");
+  }
+  if (homeLife > before) {
+    logMessage("Home Life improved thanks to better morale and living conditions!");
+  }
+}
+
+
+
+function gameTick() {
+  updateCrimeEffects();
+  checkPrisonOvercrowding();
+  passiveMoraleDropFromPrisons();
+  updateHomeLife();
+  generateFarmIncome(); // ✅ just call it here
+  updateEducation(); // ⬅️ new line
+payForPrisons();
+checkClinicCapacity();
+generateFactoryIncome();
+updateHomeLife();
+
+  updateDisplay();
+}
+
+
+
+
+
+function playSound(id) {
+  const sound = document.getElementById(id);
+  if (sound) {
+    sound.currentTime = 0; // rewind to start
+    sound.play();
+  }
+}
+  </script>
+</body>
+</html>

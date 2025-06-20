@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DnD-Lite Combat Test</title>
+  <style>
+    body { font-family: sans-serif; background: #222; color: white; padding: 20px; }
+    button { margin: 5px; padding: 10px 20px; }
+    .log { margin-top: 20px; white-space: pre-wrap; border-top: 1px solid #555; padding-top: 10px; }
+    #levelUpMenu { background: #333; padding: 10px; border: 1px solid #888; margin-top: 10px; display: none; }
+  </style>
+</head>
+<body>
+  <h2>⚔️ Combat: You vs <span id="enemyName">Angry Citizen</span></h2>
+  <div id="stats"></div>
+  <div id="actions"></div>
+  <div><button onclick="rollForAction()">🎲 Roll Action Dice</button></div>
+  <div><button onclick="viewJournal()">📓 View Journal</button></div>
+  <div class="log" id="log"></div>
+  <div id="levelUpMenu"></div>
+
+  <script>
+let lastPlayerRoll = null;
+let mysteriousStrangerTriggered = false;
+let angryCitizenDefeated = false;
+let mysteriousStrangerDefeated = false;
+let judyUnlocked = false;
+
+function rollDice(sides) {
+  return Math.floor(Math.random() * sides) + 1;
+}
+function log(message) {
+  document.getElementById("log").innerText += message + "\n";
+}
+
+class Entity {
+  constructor(name, level, hp, mana, stamina) {
+    this.name = name;
+    this.level = level;
+    this.hp = hp;
+    this.maxHp = hp;
+    this.mana = mana;
+    this.maxMana = mana;
+    this.stamina = stamina;
+    this.maxStamina = stamina;
+  }
+  isAlive() {
+    return this.hp > 0;
+  }
+  refill() {
+    this.hp = this.maxHp;
+    this.mana = this.maxMana;
+    this.stamina = this.maxStamina;
+  }
+}
+
+const ExtraAbilities = {
+  Mage: [
+    {
+      name: "Ice Shard",
+      use: function (attacker, target) {
+        if (attacker.mana < 4) return log(`${attacker.name} needs more mana!`);
+        if (lastPlayerRoll === null) return log("Roll the dice first!");
+        attacker.mana -= 4;
+        const dmg = Math.floor((rollDice(8) + 1) * (lastPlayerRoll >= 15 ? 2 : 1));
+        target.hp -= dmg;
+        log(`${attacker.name} casts Ice Shard for ${dmg} damage!`);
+        lastPlayerRoll = null;
+      }
+    }
+  ]
+};
+
+const Classes = {
+  Mage: {
+    trait: "Firebolt",
+    ability: function (attacker, target) {
+      if (attacker.mana < 5) return log(`${attacker.name} lacks mana!`);
+      if (lastPlayerRoll === null) return log("Roll the dice first!");
+      attacker.mana -= 5;
+      const dmg = Math.floor((rollDice(10) + 3) * (lastPlayerRoll >= 15 ? 2 : (lastPlayerRoll >= 10 ? 1.5 : 1)));
+      target.hp -= dmg;
+      log(`${attacker.name} burns ${target.name} for ${dmg}.`);
+      lastPlayerRoll = null;
+    }
+  }
+};
+
+class Player extends Entity {
+  constructor(name, className) {
+    super(name, 1, 30, 10, 10);
+    this.className = className;
+    this.abilities = [Classes[className].ability];
+    this.abilityNames = [Classes[className].trait];
+    this.xp = 0;
+    this.journal = [];
+  }
+  gainXP(amount) {
+    this.xp += amount;
+    log(`${this.name} gains ${amount} XP.`);
+    if (this.level === 1 && this.xp >= 10) {
+      this.levelUp();
+    }
+  }
+  unlockAbility(newText) {
+    this.journal.push(newText);
+    log(`New journal entry added.`);
+  }
+  levelUp() {
+    this.level++;
+    this.refill();
+    log("🎉 You leveled up to level 2!");
+    const menu = document.getElementById("levelUpMenu");
+    menu.innerHTML = `<h3>Level Up!</h3>
+      <p>Choose a stat to increase:</p>
+      <button onclick="chooseStat('hp')">+10 HP</button>
+      <button onclick="chooseStat('mana')">+5 Mana</button>
+      <button onclick="chooseStat('stamina')">+5 Stamina</button>`;
+    menu.style.display = 'block';
+  }
+}
+
+function chooseStat(stat) {
+  if (stat === 'hp') { player.maxHp += 10; }
+  if (stat === 'mana') { player.maxMana += 5; }
+  if (stat === 'stamina') { player.maxStamina += 5; }
+  const ability = ExtraAbilities[player.className][0];
+  player.abilities.push(ability.use);
+  player.abilityNames.push(ability.name);
+  document.getElementById("levelUpMenu").style.display = 'none';
+  updateStats();
+  updateActions();
+}
+
+class NPC extends Entity {
+  constructor(name, level, className) {
+    super(name, level, 20 + rollDice(6) * level, 10 + rollDice(4) * level, 10 + rollDice(4) * level);
+    this.className = className;
+    this.ability = Classes[className].ability;
+  }
+}
+
+const player = new Player("Hero", "Mage");
+let currentEnemy = new NPC("Angry Citizen", 1, "Mage");
+
+function updateStats() {
+  document.getElementById("stats").innerHTML =
+    `<b>${player.name}</b> (Class: ${player.className})<br>Level: ${player.level} | HP: ${player.hp}/${player.maxHp} | Mana: ${player.mana}/${player.maxMana} | Stamina: ${player.stamina}/${player.maxStamina} | XP: ${player.xp}<br><br>` +
+    `<b>${currentEnemy.name}</b> (Class: ${currentEnemy.className})<br>HP: ${currentEnemy.hp} | Mana: ${currentEnemy.mana} | Stamina: ${currentEnemy.stamina}`;
+}
+
+function updateActions() {
+  let html = "";
+  for (let i = 0; i < player.abilities.length; i++) {
+    html += `<button onclick="useAbility(${i})">${player.abilityNames[i]}</button>`;
+  }
+  html += `<button onclick="endTurn()">End Turn</button>`;
+  document.getElementById("actions").innerHTML = html;
+}
+
+function useAbility(index) {
+  if (!player.isAlive() || !currentEnemy.isAlive()) return;
+  player.abilities[index](player, currentEnemy);
+  updateStats();
+  if (!currentEnemy.isAlive()) handleVictory();
+}
+
+function endTurn() {
+  currentEnemy.ability(currentEnemy, player);
+  player.mana += 2;
+  player.stamina += 3;
+  currentEnemy.mana += 2;
+  currentEnemy.stamina += 3;
+  updateStats();
+  if (!player.isAlive()) {
+    log("You have been defeated. Refresh to retry.");
+    document.getElementById("actions").innerHTML = '';
+  }
+}
+
+function handleVictory() {
+  log(`${currentEnemy.name} has been defeated!`);
+  if (currentEnemy.name === "Angry Citizen") angryCitizenDefeated = true;
+  if (currentEnemy.name === "Mysterious Stranger") {
+    mysteriousStrangerDefeated = true;
+    handlePostStrangerVictory();
+  }
+  player.gainXP(currentEnemy.level * 10);
+  player.unlockAbility(`You defeated ${currentEnemy.name}. You're one step closer to mastering your fate.`);
+  document.getElementById("actions").innerHTML = '<button onclick="viewJournal()">View Journal</button>';
+}
+
+function handlePostStrangerVictory() {
+  log("A bystander named Judy approaches you...");
+  log("\"Thank you for taking care of those two. Here, take this.\" She gives you a shiny trinket.");
+  log("\"You're welcome at my home anytime.\"");
+  judyUnlocked = true;
+  player.unlockAbility("Investigate Judy's home. She seems suspicious.");
+}
+
+function viewJournal() {
+  document.getElementById("log").innerText = "--- JOURNAL ---\n" + player.journal.join("\n") + "\n---";
+  if (!mysteriousStrangerTriggered && angryCitizenDefeated) {
+    mysteriousStrangerTriggered = true;
+    document.getElementById("actions").innerHTML = '<button onclick="startNextBattle()">A new presence stirs...</button>';
+  } else {
+    document.getElementById("actions").innerHTML = judyUnlocked ? '<button onclick="enterJudyHome()">Enter Judy\'s Home</button>' : '<button onclick="updateActions()">Back</button>';
+  }
+}
+
+function startNextBattle() {
+  currentEnemy = new NPC("Mysterious Stranger", 2, "Mage");
+  document.getElementById("enemyName").innerText = currentEnemy.name;
+  log("A new foe approaches...");
+  updateStats();
+  updateActions();
+}
+
+function enterJudyHome() {
+  log("You enter Judy's house. It's cozy, but something feels... off.");
+  document.getElementById("actions").innerHTML = '<button onclick="updateActions()">Leave</button>';
+}
+
+function rollForAction() {
+  lastPlayerRoll = rollDice(20);
+  log(`🎲 You rolled a d20: ${lastPlayerRoll}`);
+}
+
+updateStats();
+updateActions();
+</script>
+</body>
+</html>

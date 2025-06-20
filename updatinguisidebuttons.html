@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Teomarket Terminal</title>
+  <style>
+    body {
+      cursor: url('spanishcursor.ico'), default;
+      font-family: sans-serif;
+      background: #111;
+      margin: 0;
+      height: 100vh;
+    }
+
+    #interface {
+      position: fixed;
+      bottom: 2vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40vw;
+      height: 37.5vh;
+      background: #278789;
+      border: 1px solid #333;
+      font-size: 0.85em;
+      resize: both;
+      overflow: auto;
+      z-index: 1000;
+    }
+
+    .drag-bar {
+      width: 100%;
+      height: 20px;
+      background: #fd6741;
+      color: #111;
+      font-size: 0.7em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      user-select: none;
+    }
+
+    #contentArea {
+      display: flex;
+      height: calc(100% - 20px);
+    }
+
+    #responseBox {
+      color: #f59e04;
+      flex: 3;
+      padding: 0.75em;
+      overflow-y: auto;
+      border-right: 1px solid #333;
+      background: #278789;
+      line-height: 1.4em;
+    }
+
+    #responseBox p {
+      margin-bottom: 0.8em;
+    }
+
+    #responseBox .inline-button {
+      color: #c77dff;
+      text-decoration: underline;
+      cursor: pointer;
+      margin-right: 1em;
+    }
+
+    #buttonPanel {
+      flex: 1;
+      padding: 0.75em;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #40e0d0;
+      overflow-y: auto;
+    }
+
+    #buttonPanel .side-button {
+      color: #ff0000;
+      background: none;
+      border: none;
+      text-align: left;
+      padding: 0;
+      cursor: pointer;
+      font-size: 0.9em;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="interface">
+    <div class="drag-bar" id="dragBar">[LOCATION: ???]</div>
+    <div id="contentArea">
+      <div id="responseBox"></div>
+      <div id="buttonPanel"></div>
+    </div>
+  </div>
+
+  <script>
+    const dragBar = document.getElementById("dragBar");
+    const interfaceBox = document.getElementById("interface");
+
+    // Drag logic
+    let isDragging = false, offsetX, offsetY;
+
+    dragBar.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      offsetX = e.clientX - interfaceBox.getBoundingClientRect().left;
+      offsetY = e.clientY - interfaceBox.getBoundingClientRect().top;
+      dragBar.style.cursor = "grabbing";
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+      dragBar.style.cursor = "grab";
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+      const x = e.clientX - offsetX;
+      const y = e.clientY - offsetY;
+      interfaceBox.style.left = `${x}px`;
+      interfaceBox.style.top = `${y}px`;
+      interfaceBox.style.bottom = "auto";
+      interfaceBox.style.transform = "none";
+    });
+
+    // UI logic
+    const sideButtonState = [];
+
+    function registerSideButton(label, onClick) {
+      if (sideButtonState.some(btn => btn.label === label)) return;
+      sideButtonState.push({ label, onClick });
+      renderSideButtons();
+    }
+
+    function renderSideButtons() {
+      const panel = document.getElementById("buttonPanel");
+      panel.innerHTML = '';
+      sideButtonState.forEach(btn => {
+        const b = document.createElement("button");
+        b.className = "side-button";
+        b.innerText = btn.label;
+        b.onclick = btn.onClick;
+        panel.appendChild(b);
+      });
+    }
+
+    function updateBarTitle(text) {
+      document.getElementById("dragBar").innerText = `[LOCATION: ${text}]`;
+    }
+
+    function pushResponse(text) {
+      const box = document.getElementById("responseBox");
+      const p = document.createElement("p");
+      p.innerHTML = text;
+      box.appendChild(p);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function pushResponseWithButtons(text, buttons) {
+      const box = document.getElementById("responseBox");
+      const p = document.createElement("p");
+      p.innerHTML = text;
+      buttons.forEach(btn => {
+        const b = document.createElement("span");
+        b.innerText = btn.label;
+        b.className = "inline-button";
+        b.onclick = btn.onClick;
+        p.appendChild(b);
+      });
+      box.appendChild(p);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    // Game logic also remember i want to have directions at top of screen adn buttons on left side adn level adn active qyest
+    //things for future is cursor cool 90s fat i want this to be aztec future but 90s point and click and all i can imagin is what if morrowind was fallout institute. so like clay red but low qaulity pic. adn for teh blue electricty stuff it will have to have some effect idk
+ function startQuest() {
+  updateBarTitle("Incoming Signal");
+  pushResponse("A voice crackles through static: 'Find the Orator. Memory must be proven.'");
+
+  registerSideButton("Ask who it is", () => {
+    pushResponse("The voice dodges your question.");
+  });
+
+  registerSideButton("Begin Search", talkToOrator);
+}
+
+function talkToOrator() {
+  updateBarTitle("Orator Box");
+  pushResponse("The Orator Box hums to life: 'Buy now! Todo por fe!'");
+
+  pushResponseWithButtons("The screen flickers with offers:", [
+    { label: "Glyph Sale?", onClick: () => pushResponse("Out of stock since the last eclipse.") },
+    { label: "Promo Code?", onClick: () => pushResponse("TRYDEATH45 – invalid.") }
+  ]);
+
+  registerSideButton("What are you selling?", () => {
+    pushResponse("Fine print: all deals are hypothetical. Satisfaction not guaranteed.");
+  });
+
+  registerSideButton("Who am I?", () => {
+    pushResponse("It’s in your data signature. Transparent as a god shard.");
+    registerSideButton("Review Signature", () => {
+      pushResponse("Your name is buried in glitch-code. Only fragments remain.");
+    });
+  });
+
+  registerSideButton("Go to Broken Bellows", enterBrokenBellows);
+}
+
+function enterBrokenBellows() {
+  updateBarTitle("Broken Bellows");
+  pushResponse("The workshop smells like ozone and rust. Tools hum. People murmur.");
+
+  pushResponseWithButtons("Ezri glances up from a cracked screen: '¿Haces esto tú?'", [
+    { label: "Sí, hago esto.", onClick: ezriAffirmation },
+    { label: "Sí, haces esto.", onClick: wrongAnswer },
+    { label: "Sí, hacemos esto.", onClick: wrongAnswer }
+  ]);
+}
+
+function ezriAffirmation() {
+  pushResponse("Ezri nods. 'Exacto. *Haces* esto todos los días.'");
+  registerSideButton("Talk to Rolo", talkToRolo);
+}
+
+function talkToRolo() {
+  updateBarTitle("Rolo");
+  pushResponse("Rolo adjusts his satchel: '¿Qué hacen ustedes aquí?'");
+
+  pushResponseWithButtons("How do you respond?", [
+    { label: "Hacemos reparaciones.", onClick: roloAffirmation },
+    { label: "Hacen reparaciones.", onClick: wrongAnswer },
+    { label: "Hago reparaciones.", onClick: wrongAnswer }
+  ]);
+}
+
+function roloAffirmation() {
+  pushResponse("Rolo smiles. 'Entonces *hacen* un buen trabajo.'");
+  registerSideButton("Talk to Madame Tilda", talkToTilda);
+}
+
+function talkToTilda() {
+  updateBarTitle("Madame Tilda");
+  pushResponse("Madame Tilda leans on her cane. 'Mi nieta... ¿hace eso también?'");
+
+  pushResponseWithButtons("How do you answer?", [
+    { label: "Sí, ella hace eso.", onClick: tildaAffirmation },
+    { label: "Sí, tú haces eso.", onClick: wrongAnswer },
+    { label: "Sí, yo hago eso.", onClick: wrongAnswer }
+  ]);
+}
+
+function tildaAffirmation() {
+  pushResponse("Madame Tilda: 'Entonces *hace* más de lo que admite.'");
+  registerSideButton("Inspect Workbench", () => {
+    pushResponse("You pick up a soldering iron. *Hago esto... right?* It feels familiar.");
+  });
+
+  registerSideButton("Inspect Tool Wall", () => {
+    pushResponse("A wrench nearly falls. *¿Hacemos esto juntos?* Something stirs in your head.");
+  });
+
+  registerSideButton("Inspect Gearbox", () => {
+    pushResponse("Grease-smudged gears clack. *Ellos hacen esto sin thinking...*");
+  });
+}
+
+function wrongAnswer() {
+  pushResponse("They raise an eyebrow. 'No... that's not quite right.'");
+}
+
+    window.onload = startQuest;
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Branching Dialogue Code Generator</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input, textarea { width: 100%; margin: 5px 0; padding: 8px; }
+    button { margin: 10px 0; padding: 10px; }
+    .response-set { border: 1px solid #ccc; padding: 10px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Dialogue Code Generator</h1>
+
+  <div>
+    <label>Function Name (Start Function)</label>
+    <input type="text" id="startFunctionName" placeholder="e.g. talkToMaru">
+
+    <label>Follow-up Base Name</label>
+    <input type="text" id="followupBase" placeholder="e.g. maru">
+
+    <label>NPC Opening Line</label>
+    <textarea id="npcOpening"></textarea>
+
+    <label>Your Response</label>
+    <textarea id="playerResponse"></textarea>
+
+    <label>NPC Reply to Your Response</label>
+    <textarea id="npcReply"></textarea>
+  </div>
+
+  <div id="followupOptions">
+    <h3>Follow-up Options</h3>
+  </div>
+  <button onclick="addOption()">Add More Options</button>
+
+  <div id="followupSections"></div>
+
+  <button onclick="generateCode()">Generate Code</button>
+
+  <h2>Generated Code</h2>
+  <pre id="output"></pre>
+
+  <script>
+  
+    let followupCount = 0;
+
+    function addOption() {
+      const index = followupCount++;
+      const container = document.createElement("div");
+      container.className = "optionPair";
+      container.innerHTML = `<input type="text" placeholder="Follow-up Option Text" oninput="createFollowupSection(${index})">`;
+      document.getElementById("followupOptions").appendChild(container);
+      createFollowupSection(index);
+    }
+
+    function createFollowupSection(index) {
+      const followupSections = document.getElementById("followupSections");
+      let section = document.getElementById(`followupSection${index}`);
+      if (!section) {
+        section = document.createElement("div");
+        section.className = "response-set";
+        section.id = `followupSection${index}`;
+        section.innerHTML = `
+          <h4>Follow-up ${index}</h4>
+          <label>NPC Opening Line</label>
+          <textarea class="nestedOpening"></textarea>
+          <div class="nestedOptions" id="nestedOptions${index}">
+            <h5>Follow-up Options</h5>
+            <div class="optionPair"><input type="text" placeholder="Nested Follow-up Option Text"></div>
+          </div>
+          <button onclick="addNestedOption(${index})">Add Nested Option</button>
+        `;
+        followupSections.appendChild(section);
+      }
+    }
+
+    function addNestedOption(index) {
+      const nestedContainer = document.getElementById(`nestedOptions${index}`);
+      const newInput = document.createElement("div");
+      newInput.className = "optionPair";
+      newInput.innerHTML = '<input type="text" placeholder="Nested Follow-up Option Text">';
+      nestedContainer.appendChild(newInput);
+    }
+
+    function generateCode() {
+      const funcName = document.getElementById("startFunctionName").value.trim();
+      const followupPrefix = document.getElementById("followupBase").value.trim();
+      const npcOpening = document.getElementById("npcOpening").value.trim();
+      const playerResponse = document.getElementById("playerResponse").value.trim();
+      const npcReply = document.getElementById("npcReply").value.trim();
+      const options = document.querySelectorAll("#followupOptions .optionPair input");
+
+      let fullCode = "";
+
+      let responseFunc = `function ${funcName}() {\n  document.getElementById(\"app\").innerHTML = \
+    \`<p>${npcOpening}</p><br>\n     <button onclick=\"playerResponds()\">${playerResponse}</button>\`;
+}`;
+
+      let playerFunc = `function playerResponds() {\n  document.getElementById(\"app\").innerHTML = \
+    \`<p>${npcReply}</p>`;
+
+      options.forEach((opt, index) => {
+        const optText = opt.value.trim();
+        if (optText) {
+          playerFunc += `<br><button onclick=\\"${followupPrefix}${index}()\\">${optText}</button>`;
+        }
+      });
+
+      playerFunc += '\`;}';
+    
+      fullCode += responseFunc + '\n\n' + playerFunc + '\n\n';
+
+      options.forEach((opt, index) => {
+        const optText = opt.value.trim();
+        const followupSection = document.getElementById(`followupSection${index}`);
+        if (optText && followupSection) {
+          const npcLine = followupSection.querySelector(".nestedOpening").value.trim();
+          const nestedOptions = followupSection.querySelectorAll(".nestedOptions input");
+          let followupFunc = `function ${followupPrefix}${index}() {\n  document.getElementById(\"app\").innerHTML = \
+    \`<p>${npcLine}</p>`;
+          nestedOptions.forEach((no, i) => {
+            const noText = no.value.trim();
+            if (noText) {
+followupFunc += `<br><button onclick=\\"${followupPrefix}${index}_${i}()\\">${noText}</button>`;
+            }
+          });
+          followupFunc += '\`;}';
+          fullCode += followupFunc + '\n\n';
+
+          nestedOptions.forEach((no, i) => {
+  const noText = no.value.trim();
+  if (noText) {
+    const nestedFunc = `function ${followupPrefix}${index}_${i}() {\n  document.getElementById("app").innerHTML = \`<p>[Placeholder response for ${noText}]</p><br><button onclick=\\"${funcName}()\\">Back</button>\`;\n}`;
+    fullCode += nestedFunc + '\n\n';
+  }
+});
+
+        }
+      });
+
+      document.getElementById("output").textContent = fullCode;
+    }
+  </script>
+</body>
+</html>

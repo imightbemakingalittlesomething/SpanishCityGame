@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Star Flat-List Snippet Generator</title>
+  <style>
+    body { background-color: purple; font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+    textarea, input { width: 100%; margin-top: 10px; padding: 10px; font-family: monospace; }
+    button { margin-top: 15px; padding: 10px 20px; font-weight: bold; }
+    label { font-weight: bold; margin-top: 15px; display: block; }
+  </style>
+</head>
+<body>
+
+  <h2>🔁 Star Snippet Generator – Flat List Mode</h2>
+
+  <label for="template">Template Snippet</label>
+  <textarea id="template" rows="6" placeholder="e.g. &lt;div class='{{color}}'&gt;{{name}}&lt;/div&gt;"></textarea>
+
+  <label for="count">Number of Repetitions</label>
+  <input type="number" id="count" min="1" value="6">
+
+  <label for="values">Flat List of Values (comma-separated)</label>
+  <input type="text" id="values" placeholder="e.g. red,alpha,blue,beta,green,gamma">
+
+  <button onclick="generate()">Generate</button>
+
+  <h3>📦 Output</h3>
+  <textarea id="output" rows="10" readonly></textarea>
+
+
+  <script>
+    function generate() {
+      const template = document.getElementById("template").value;
+      const count = parseInt(document.getElementById("count").value, 10);
+      const output = document.getElementById("output");
+      const flatValues = document.getElementById("values").value.split(',').map(v => v.trim()).filter(v => v);
+
+      // Get variables from template
+      const keys = [...template.matchAll(/{{(.*?)}}/g)].map(m => m[1]);
+
+      if (keys.length === 0) {
+        output.value = "⚠️ No variables found in template.";
+        return;
+      }
+
+      let result = [];
+      let valueIndex = 0;
+
+      for (let i = 0; i < count; i++) {
+        let line = template;
+
+        keys.forEach(key => {
+          const value = key === "i" ? i : flatValues[valueIndex % flatValues.length];
+          const regex = new RegExp(`{{${key}}}`, 'g');
+          line = line.replace(regex, value);
+          if (key !== "i") valueIndex++;
+        });
+
+        result.push(line);
+      }
+
+      output.value = result.join("\n");
+    }
+  </script>
+
+</body>
+</html>

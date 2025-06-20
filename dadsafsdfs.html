@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Teomarket Terminal</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #111;
+      color: #f59e04;
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #playerLevel {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      font-size: 0.9em;
+    }
+
+    #directionIndicator {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.9em;
+    }
+
+    #leftSidebar {
+      position: fixed;
+      top: 50px;
+      left: 10px;
+      width: 200px;
+      height: 80vh;
+      background: #222;
+      border: 1px solid #333;
+      padding: 10px;
+      overflow-y: auto;
+    }
+
+    .sidebar-button {
+      display: block;
+      color: #bf80ff;
+      text-decoration: underline;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+
+    #activeQuestDisplay {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      width: 200px;
+      background: #222;
+      border: 1px solid #333;
+      padding: 8px;
+      font-size: 0.8em;
+    }
+
+    #interface {
+      position: fixed;
+      bottom: 2vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40vw;
+      height: 37.5vh;
+      background: #278789;
+      border: 1px solid #333;
+      font-size: 0.85em;
+      resize: both;
+      overflow: auto;
+      z-index: 1000;
+    }
+
+    .drag-bar {
+      width: 100%;
+      height: 20px;
+      background: #fd6741;
+      color: #111;
+      font-size: 0.7em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      user-select: none;
+    }
+
+    #contentArea {
+      display: flex;
+      height: calc(100% - 20px);
+    }
+
+    #responseBox {
+      flex: 3;
+      color: #888888;
+      padding: 0.75em;
+      overflow-y: auto;
+      border-right: 1px solid #333;
+      background: #278789;
+      line-height: 1.4em;
+    }
+
+    #responseBox p {
+      margin-bottom: 0.8em;
+    }
+
+    #responseBox .inline-button {
+      color: pink;
+      text-decoration: underline;
+      cursor: pointer;
+      margin-right: 1em;
+    }
+
+    #buttonPanel {
+     color: #900223;
+      flex: 1;
+      padding: 0.75em;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #40e0d0;
+      overflow-y: auto;
+    }
+
+    #buttonPanel .side-button {
+      background: none;
+      border: none;
+         color: #ff0000; /* Red for side buttons */
+;
+      text-align: left;
+      padding: 0;
+      cursor: pointer;
+      font-size: 0.9em;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div id="playerLevel">Level: 3</div>
+  <div id="directionIndicator">Direction: North</div>
+
+  <div id="leftSidebar">
+    <div class="sidebar-button" onclick="openQuestBoard()">Mission Board</div>
+    <div class="sidebar-button" onclick="openInventory()">Inventory</div>
+    <div class="sidebar-button" onclick="viewMap()">Map</div>
+  </div>
+
+  <div id="activeQuestDisplay">
+    <strong>Active Quest:</strong><br>
+    Name: <span id="activeQuestName">None</span><br>
+    Info: <span id="activeQuestInfo">No active quest selected.</span>
+  </div>
+
+  <div id="interface">
+    <div class="drag-bar" id="dragBar">[LOCATION: ???]</div>
+    <div id="contentArea">
+      <div id="responseBox"></div>
+      <div id="buttonPanel"></div>
+    </div>
+  </div>
+
+  <script>
+    const interfaceBox = document.getElementById("interface");
+    const dragBar = document.getElementById("dragBar");
+
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    dragBar.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      offsetX = e.clientX - interfaceBox.getBoundingClientRect().left;
+      offsetY = e.clientY - interfaceBox.getBoundingClientRect().top;
+      dragBar.style.cursor = "grabbing";
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+      dragBar.style.cursor = "grab";
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+      const x = e.clientX - offsetX;
+      const y = e.clientY - offsetY;
+      interfaceBox.style.left = `${x}px`;
+      interfaceBox.style.top = `${y}px`;
+      interfaceBox.style.bottom = "auto";
+      interfaceBox.style.transform = "none";
+    });
+
+    function updateBarTitle(text) {
+      document.getElementById("dragBar").innerText = `[LOCATION: ${text}]`;
+    }
+
+    function pushResponse(text) {
+      const box = document.getElementById("responseBox");
+      const p = document.createElement("p");
+      p.innerHTML = text;
+      box.appendChild(p);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function pushResponseWithButtons(text, buttons) {
+      const box = document.getElementById("responseBox");
+      const p = document.createElement("p");
+      p.innerHTML = text;
+      buttons.forEach(btn => {
+        const b = document.createElement("span");
+        b.innerText = btn.label;
+        b.className = "inline-button";
+        b.onclick = btn.onClick;
+        p.appendChild(b);
+      });
+      box.appendChild(p);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function setButtons(buttons) {
+      const panel = document.getElementById("buttonPanel");
+      panel.innerHTML = '';
+      buttons.forEach(btn => {
+        const b = document.createElement("button");
+        b.className = "side-button";
+        b.innerText = btn.label;
+        b.onclick = btn.onClick;
+        panel.appendChild(b);
+      });
+    }
+
+    function startQuest() {
+      updateBarTitle("Incoming Signal");
+      pushResponse("A voice crackles through static: 'Find the Orator. Memory must be proven.'");
+      setButtons([
+        { label: "Who are you?", onClick: () => pushResponse("No time. Just move.") },
+        { label: "Where am I?", onClick: () => pushResponse("You'll remember soon.") },
+        { label: "Go to Orator", onClick: talkToOrator }
+      ]);
+    }
+
+    function talkToOrator() {
+      updateBarTitle("Orator Box");
+      pushResponse("The Orator Box hums to life: 'Buy now! Todo por fe!'");
+      setButtons([
+        { label: "What are you selling?", onClick: () => pushResponse("Fine print: all deals are hypothetical. Satisfaction not guaranteed.") },
+        { label: "Who am I?", onClick: () => pushResponse("It's in your data signature. Transparent as a god shard.") },
+        { label: "You're really annoying.", onClick: () => pushResponse("The citizens voted for volume! ...At least 38% did.") },
+        { label: "Back to Start", onClick: startQuest }
+      ]);
+      pushResponseWithButtons("The screen flickers with offers:", [
+        { label: "Glyph Sale?", onClick: () => pushResponse("Out of stock since the last eclipse.") },
+        { label: "Promo Code?", onClick: () => pushResponse("TRYDEATH45 – invalid.") }
+      ]);
+    }
+
+    window.onload = startQuest;
+  </script>
+</body>
+</html>

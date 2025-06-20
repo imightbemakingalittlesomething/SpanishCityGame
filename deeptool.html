@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neopets Placeholder Game</title>
+    <style>
+         body { background-color: #663399;  font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        button { display: block; margin: 10px auto; padding: 10px; font-size: 16px; }
+
+
+       
+
+  /* body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            background: url('https://i.imgur.com/OR0kjLR.jpeg') no-repeat center center/cover;
+            color: white;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .overlay {
+      
+    </style>
+</head>
+<body>
+
+    <div id="app"></div>
+
+    <h3>Template Replacer</h3>
+<textarea id="rawList" placeholder="talkToAlto\ntalkToEzri"></textarea>
+<button onclick="applyTemplate()">Apply Template</button>
+<textarea id="filledCode" rows="10" readonly></textarea>
+
+<script>
+function applyTemplate() {
+  const names = document.getElementById("rawList").value
+    .split(/\\s+/)
+    .filter(Boolean);
+
+  const output = names.map(name => `
+function ${name}() {
+  document.getElementById("app").innerHTML = \`
+    <h1>${name}</h1>
+    <p>[Replace with dialogue or content for ${name}]</p>
+    <button onclick="renderBrokenBellows()">Back</button>
+  \`;
+}`).join("\\n");
+
+  document.getElementById("filledCode").value = output;
+}
+</script>
+
+
+</body>
+</html>

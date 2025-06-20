@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flat Mode Snippet Generator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f0e6f6;
+      color: #4b0082;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    textarea, input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-family: monospace;
+      background-color: #e5d4f4;
+      border: 1px solid #c8a2c8;
+      color: #4b0082;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-weight: bold;
+      background-color: #d1a3ff;
+      color: #4b0082;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>💜 Flat Mode Snippet Generator</h2>
+
+  <label for="template">Template Snippet</label>
+  <textarea id="template" rows="6" placeholder="Example: {{1}} is a {{3}} living in {{2}}. Carries {{4}}."></textarea>
+
+  <label for="flatCount">How many flat variables per row?</label>
+  <input type="number" id="flatCount" value="4">
+
+  <label for="rawValues">Enter raw rows (each row is a full set)</label>
+  <textarea id="rawValues" rows="6" placeholder="e.g. Alice,Temple,Rebel Leader,Amulet"></textarea>
+
+  <button onclick="generate()">🚀 Generate Snippets</button>
+
+  <h3>🧾 Output</h3>
+  <textarea id="output" rows="10" readonly></textarea>
+
+  <script>
+    function generate() {
+      const template = document.getElementById("template").value;
+      const flatCount = parseInt(document.getElementById("flatCount").value);
+      const raw = document.getElementById("rawValues").value.trim().split('\n');
+      const output = document.getElementById("output");
+
+      const results = [];
+
+      raw.forEach(line => {
+        const values = line.split(',').map(v => v.trim());
+        if (values.length < flatCount) return; // Skip incomplete rows
+
+        let filled = template;
+        for (let i = 1; i <= flatCount; i++) {
+          const regex = new RegExp(`{{${i}}}`, 'g');
+          filled = filled.replace(regex, values[i - 1]);
+        }
+
+        results.push(filled);
+      });
+
+      output.value = results.join('\n');
+    }
+  </script>
+
+</body>
+</html>
