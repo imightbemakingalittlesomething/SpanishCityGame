@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Teomarket Terminal</title>
+  <style>
+    body {
+      cursor: url('spanishcursor.ico'), default;
+      font-family: sans-serif;
+      background: #111;
+      margin: 0;
+      height: 100vh;
+    }
+  #app {
+      position: fixed;
+      top: 10vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60vw;
+      min-height: 50vh;
+      color: #fefefe;
+      font-size: 1em;
+      text-align: center;
+      padding: 1em;
+      background: #1b1b1b;
+      border: 2px solid #555;
+      border-radius: 8px;
+      z-index: 10;
+    }
+
+    #app button {
+      margin: 8px;
+      padding: 10px 14px;
+      font-size: 1em;
+      background: #c77dff;
+      color: #111;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #app button:hover {
+      background: #9b5de5;
+    }
+    #interface {
+      position: fixed;
+      bottom: 2vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40vw;
+      height: 37.5vh;
+      background: #278789;
+      border: 1px solid #333;
+      font-size: 0.85em;
+      resize: both;
+      overflow: auto;
+      z-index: 1000;
+    }
+
+    .drag-bar {
+      width: 100%;
+      height: 20px;
+      background: #fd6741;
+      color: #111;
+      font-size: 0.7em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      user-select: none;
+    }
+
+    #contentArea {
+      display: flex;
+      height: calc(100% - 20px);
+    }
+
+    #responseBox {
+      color: #f59e04;
+      flex: 3;
+      padding: 0.75em;
+      overflow-y: auto;
+      border-right: 1px solid #333;
+      background: #278789;
+      line-height: 1.4em;
+    }
+
+    #responseBox p {
+      margin-bottom: 0.8em;
+    }
+
+    #responseBox .inline-button {
+      color: #c77dff;
+      text-decoration: underline;
+      cursor: pointer;
+      margin-right: 1em;
+    }
+
+    #buttonPanel {
+      flex: 1;
+      padding: 0.75em;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #40e0d0;
+      overflow-y: auto;
+    }
+
+    #buttonPanel .side-button {
+      color: #ff0000;
+      background: none;
+      border: none;
+      text-align: left;
+      padding: 0;
+      cursor: pointer;
+      font-size: 0.9em;
+      text-decoration: underline;
+    }
+
+    #locationButtons {
+      position: fixed;
+      top: 5vh;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      z-index: 500;
+    }
+
+    .location-button {
+      background: #c77dff;
+      color: #111;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    .location-button:hover {
+      background: #9b5de5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Central Location Button Bar -->
+     <div id="app"></div>
+
+
+  <!-- Dialogue Box -->
+  <div id="interface">
+    <div class="drag-bar" id="dragBar">[LOCATION: ???]</div>
+    <div id="contentArea">
+      <div id="responseBox"></div>
+      <div id="buttonPanel"></div>
+    </div>
+  </div>
+
+  <script>
+    const dragBar = document.getElementById("dragBar");
+    const interfaceBox = document.getElementById("interface");
+
+    let isDragging = false, offsetX, offsetY;
+
+    dragBar.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      offsetX = e.clientX - interfaceBox.getBoundingClientRect().left;
+      offsetY = e.clientY - interfaceBox.getBoundingClientRect().top;
+      dragBar.style.cursor = "grabbing";
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+      dragBar.style.cursor = "grab";
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+      const x = e.clientX - offsetX;
+      const y = e.clientY - offsetY;
+      interfaceBox.style.left = `${x}px`;
+      interfaceBox.style.top = `${y}px`;
+      interfaceBox.style.bottom = "auto";
+      interfaceBox.style.transform = "none";
+    });
+
+    const sideButtonState = [];
+
+    function registerSideButton(label, onClick) {
+      if (sideButtonState.some(btn => btn.label === label)) return;
+      sideButtonState.push({ label, onClick });
+      renderSideButtons();
+    }
+
+    function renderSideButtons() {
+      const panel = document.getElementById("buttonPanel");
+      panel.innerHTML = '';
+      sideButtonState.forEach(btn => {
+        const b = document.createElement("button");
+        b.className = "side-button";
+        b.innerText = btn.label;
+        b.onclick = btn.onClick;
+        panel.appendChild(b);
+      });
+    }
+
+    function updateBarTitle(text) {
+      document.getElementById("dragBar").innerText = `[LOCATION: ${text}]`;
+    }
+
+    function pushResponse(text) {
+      const box = document.getElementById("responseBox");
+      const p = document.createElement("p");
+      p.innerHTML = text;
+      box.appendChild(p);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function pushResponseWithButtons(text, buttons) {
+      const box = document.getElementById("responseBox");
+      const p = document.createElement("p");
+      p.innerHTML = text;
+      buttons.forEach(btn => {
+        const b = document.createElement("span");
+        b.innerText = btn.label;
+        b.className = "inline-button";
+        b.onclick = btn.onClick;
+        p.appendChild(b);
+      });
+      box.appendChild(p);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function startQuest() {
+      updateBarTitle("Incoming Signal");
+      pushResponse("A voice crackles through static: 'Find the Orator. Memory must be proven.'");
+
+      registerSideButton("Ask who it is", () => {
+        pushResponse("The voice dodges your question.");
+      });
+
+      registerSideButton("Begin Search", talkToOrator);
+    }
+
+    function talkToOrator() {
+      updateBarTitle("Orator Box");
+      pushResponse("The Orator Box hums to life: 'Buy now! Todo por fe!'");
+renderMainMenu();
+      pushResponseWithButtons("The screen flickers with offers:", [
+        { label: "Glyph Sale?", onClick: () => pushResponse("Out of stock since the last eclipse.") },
+        { label: "Promo Code?", onClick: () => pushResponse("TRYDEATH45 – invalid.") }
+      ]);
+
+      registerSideButton("What are you selling?", () => {
+        pushResponse("Fine print: all deals are hypothetical. Satisfaction not guaranteed.");
+      });
+
+      registerSideButton("Who am I?", () => {
+        pushResponse("It’s in your data signature. Transparent as a god shard.");
+        registerSideButton("Review Signature", () => {
+          pushResponse("Your name is buried in glitch-code. Only fragments remain.");
+        });
+      });
+    }
+
+    function enterBrokenBellows() {
+      updateBarTitle("Broken Bellows");
+      sideButtonState.length = 0;
+      renderSideButtons();
+      pushResponse("The workshop smells like ozone and rust. Tools hum. People murmur.");
+
+      pushResponseWithButtons("Ezri glances up from a cracked screen: '¿Haces esto tú?'", [
+        { label: "Sí, hago esto.", onClick: ezriAffirmation },
+        { label: "Sí, haces esto.", onClick: wrongAnswer },
+        { label: "Sí, hacemos esto.", onClick: wrongAnswer }
+      ]);
+    }
+
+    function ezriAffirmation() {
+      pushResponse("Ezri nods. 'Exacto. *Haces* esto todos los días.'");
+      registerSideButton("Talk to Rolo", talkToRolo);
+    }
+
+    function talkToRolo() {
+      updateBarTitle("Rolo");
+      pushResponse("Rolo adjusts his satchel: '¿Qué hacen ustedes aquí?'");
+
+      pushResponseWithButtons("How do you respond?", [
+        { label: "Hacemos reparaciones.", onClick: roloAffirmation },
+        { label: "Hacen reparaciones.", onClick: wrongAnswer },
+        { label: "Hago reparaciones.", onClick: wrongAnswer }
+      ]);
+    }
+
+    function roloAffirmation() {
+      pushResponse("Rolo smiles. 'Entonces *hacen* un buen trabajo.'");
+      registerSideButton("Talk to Madame Tilda", talkToTilda);
+    }
+
+    function talkToTilda() {
+      updateBarTitle("Madame Tilda");
+      pushResponse("Madame Tilda leans on her cane. 'Mi nieta... ¿hace eso también?'");
+
+      pushResponseWithButtons("How do you answer?", [
+        { label: "Sí, ella hace eso.", onClick: tildaAffirmation },
+        { label: "Sí, tú haces eso.", onClick: wrongAnswer },
+        { label: "Sí, yo hago eso.", onClick: wrongAnswer }
+      ]);
+    }
+
+    function tildaAffirmation() {
+      pushResponse("Madame Tilda: 'Entonces *hace* más de lo que admite.'");
+      registerSideButton("Inspect Workbench", () => {
+        pushResponse("You pick up a soldering iron. *Hago esto... right?* It feels familiar.");
+      });
+
+      registerSideButton("Inspect Tool Wall", () => {
+        pushResponse("A wrench nearly falls. *¿Hacemos esto juntos?* Something stirs in your head.");
+      });
+
+      registerSideButton("Inspect Gearbox", () => {
+        pushResponse("Grease-smudged gears clack. *Ellos hacen esto sin thinking...*");
+      });
+    }
+
+    function wrongAnswer() {
+      pushResponse("They raise an eyebrow. 'No... that's not quite right.'");
+    }
+
+    function enterJaguarBastion() {
+      updateBarTitle("Jaguar Bastion");
+      sideButtonState.length = 0;
+      renderSideButtons();
+      pushResponse("Massive obsidian towers rise around you. It's quiet... too quiet.");
+    }
+
+    function enterTzompaniPlaza() {
+      updateBarTitle("Tzompani Plaza");
+      sideButtonState.length = 0;
+      renderSideButtons();
+      pushResponse("Colorful stalls. Laughter. Drums. Your memory stirs beneath the noise.");
+    }
+
+  function renderMainMenu() {
+      document.getElementById("app").innerHTML = `
+        <h1>Tenochtitech Terminal</h1>
+        <p><strong>Credits:</strong> 300c</p>
+        <button onclick="renderCityMap()">Access City Map</button>
+        <button onclick="renderInventory()">Inventory</button>
+        <button onclick="renderMissionBoard()">Mission Board</button>
+      `;
+    }
+
+    function renderCityMap() {
+      document.getElementById("app").innerHTML = `
+        <h1>📡 Tenochtitech District Grid</h1>
+        <p>Select a district to investigate:</p>
+        <button onclick="enterBrokenBellows()">Enter Broken Bellows</button>
+        <button onclick="renderPlazaTzompani()">Visit Plaza Tzompani</button>
+        <button onclick="renderTeomarket()">Go to Teomarket Complex</button>
+        <button onclick="renderCodexSpire()">Access Codex Spire</button>
+        <button onclick="enterJaguarBastion()">Approach Jaguar Bastion</button>
+        <br><br>
+        <button onclick="renderMainMenu()">Return to Terminal</button>
+      `;
+    }
+
+    function renderInventory() {
+      const inventoryItems = ["Map", "Chip", "Glyph"];
+      document.getElementById("app").innerHTML = `
+        <h1>Inventory</h1>
+        <p><strong>Items:</strong> ${inventoryItems.join(", ")}</p>
+        <button onclick="renderMainMenu()">Back</button>
+      `;
+    }
+
+    function renderMissionBoard() {
+      document.getElementById("app").innerHTML = `
+        <h1>Mission Board</h1>
+        <p>No active missions.</p>
+        <button onclick="renderMainMenu()">Back</button>
+      `;
+    }
+
+
+
+
+
+
+
+
+
+function enterJaguarBastion() {
+  updateBarTitle("Jaguar Bastion");
+  sideButtonState.length = 0;
+  renderSideButtons();
+  document.getElementById("app").innerHTML = `
+    <h1>🛡️ Jaguar Bastion</h1>
+    <p>A fortified megastructure, gleaming with ceremonial obsidian and powered conduits. Sacred military operations are conducted here—alongside open plazas for civilians.</p>
+    
+    <button onclick="inspectShrine()">Inspect Divine Shrine</button>
+    <button onclick="stealGlyphBadge()">Steal Glyph Badge</button>
+    <button onclick="observeTraining()">Observe Training Yard</button>
+    <button onclick="talkToGatekeeper()">Talk to Gatekeeper</button>
+    <button onclick="talkToArchivist()">Speak with the Archivist</button>
+    <br><br>
+    <button onclick="renderCityMap()">Return to Map</button>
+  `;
+}
+
+function inspectShrine() {
+  document.getElementById("app").innerHTML += `<p><em>You kneel at a polished obsidian shrine. The scent of copper and ozone tingles your senses. A whisper echoes: “We see you, even now.”</em></p>`;
+}
+
+function stealGlyphBadge() {
+  document.getElementById("app").innerHTML += `<p><em>You swipe a forgotten glyph badge from a locker bench. It pulses faintly. You’re not sure it’s safe to keep.</em></p>`;
+}
+
+function observeTraining() {
+  document.getElementById("app").innerHTML += `<p><em>Rows of soldiers march to a pulse beat. Drones hover silently overhead. A young recruit stumbles. Nobody helps him up.</em></p>`;
+}
+
+// === NPCs (dialogue box) ===
+
+function talkToGatekeeper() {
+  updateBarTitle("Gatekeeper Ayo");
+  pushResponse("Ayo’s armor hums faintly. 'No appointment? Then you wait.'");
+
+  pushResponseWithButtons("How do you respond?", [
+    { label: "I have clearance.", onClick: () => pushResponse("He scans you. 'If you did, it’s not showing.'") },
+    { label: "I’ll wait.", onClick: () => pushResponse("'Fine. But don’t touch anything divine.'") },
+    { label: "Why is access restricted?", onClick: () => pushResponse("'Because the gods don’t like drop-ins.'") }
+  ]);
+}
+
+function talkToArchivist() {
+  updateBarTitle("Archivist Meztli");
+  pushResponse("Meztli floats slightly above the floor. Her voice is like rustling silk: 'Your data signature is… corrupted.'");
+
+  pushResponseWithButtons("What do you ask?", [
+    { label: "Do I have a file?", onClick: () => pushResponse("'Yes. But it's been sealed by divine warrant.'") },
+    { label: "Can I appeal it?", onClick: () => pushResponse("'With proper offerings, perhaps. We accept memory echoes.'") },
+    { label: "Who sealed it?", onClick: () => pushResponse("'I cannot speak their name. It burns the tongue.'") }
+  ]);
+}
+
+
+
+
+
+
+
+
+    // === Start Point ===
+    window.onload =   startQuest;  </script>
+
+</body>
+</html>
